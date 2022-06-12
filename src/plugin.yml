@@ -1,0 +1,5 @@
+name: WatchWolf
+main: com.rogermiranda1000.watchwolf.server.Server
+version: 0.1
+author: rogermiranda1000
+api-version: 1.13
