@@ -120,7 +120,7 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                 e.printStackTrace();
             }
 
-            while (this.clientSocket != null) {
+            while (this.clientSocket != null && !this.clientSocket.isClosed()) {
                 try {
                     DataInputStream dis = new DataInputStream(this.clientSocket.getInputStream());
                     DataOutputStream dos = new DataOutputStream(this.clientSocket.getOutputStream());
