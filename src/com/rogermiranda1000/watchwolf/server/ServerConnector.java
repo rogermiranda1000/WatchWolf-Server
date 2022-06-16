@@ -1,5 +1,8 @@
 package com.rogermiranda1000.watchwolf.server;
 
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -16,11 +19,13 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
     private Socket clientSocket;
 
     private final String replyKey;
+    private final Plugin plugin;
     private final ServerPetition serverPetition;
 
-    public ServerConnector(String allowedIp, int port, Socket reply, String key, ServerPetition serverPetition) throws IOException {
+    public ServerConnector(String allowedIp, int port, Socket reply, String key, Plugin plugin, ServerPetition serverPetition) throws IOException {
         this.allowedIp = allowedIp;
         this.serverSocket = new ServerSocket(port);
+        this.plugin = plugin;
         this.serverPetition = serverPetition;
 
         this.replySocket = reply;
@@ -85,9 +90,8 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
             }
 
             while (this.clientSocket != null) {
-                DataInputStream dis = null;
                 try {
-                    dis = new DataInputStream(this.clientSocket.getInputStream());
+                    DataInputStream dis = new DataInputStream(this.clientSocket.getInputStream());
                     DataOutputStream dos = new DataOutputStream(this.clientSocket.getOutputStream());
 
                     byte first = dis.readByte();
@@ -102,11 +106,17 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                             // TODO implement all
                             switch (dis.readShort()) {
                                 case 0x0001:
-                                    this.serverPetition.stopServer(null); // TODO notify
+                                    Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
+                                        this.serverPetition.stopServer(null);
+                                        return null;
+                                    }); // TODO notify
                                     break;
 
                                 case 0x0004:
-                                    this.serverPetition.opPlayer(ServerConnector.readString(dis));
+                                    Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
+                                        this.serverPetition.opPlayer(ServerConnector.readString(dis));
+                                        return null;
+                                    });
                                     break;
                             }
                             break;
@@ -118,7 +128,6 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                     e.printStackTrace();
                 } catch (UnexpectedPacket ex) {
                     ex.printStackTrace();
-                    try { dis.reset(); } catch (IOException | NullPointerException ignored) {}
                 }
             }
         }

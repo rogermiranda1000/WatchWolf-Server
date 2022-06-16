@@ -24,7 +24,7 @@ public class Server extends JavaPlugin implements ServerPetition {
 
         try {
             getLogger().info("Hosting on " + port + " (for " + ip + ")");
-            this.connector = new ServerConnector(ip, port, new Socket(replyIP[0], Integer.parseInt(replyIP[1])), config.getString("key"), this);
+            this.connector = new ServerConnector(ip, port, new Socket(replyIP[0], Integer.parseInt(replyIP[1])), config.getString("key"), this, this);
             this.connector.onServerStart();
             new Thread(this.connector).start();
         } catch (IOException e) {
@@ -48,17 +48,20 @@ public class Server extends JavaPlugin implements ServerPetition {
     @Override
     public void opPlayer(String nick) {
         if (!Server.isUsername(nick)) return;
+        getLogger().info("OP player (" + nick + ") request");
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "op " + nick);
     }
 
     @Override
     public void whitelistPlayer(String nick) {
         if (!Server.isUsername(nick)) return;
+        getLogger().info("Whitelist player (" + nick + ") request");
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "whitelist add " + nick);
     }
 
     @Override
     public void stopServer(ServerStopNotifier onServerStop) {
+        getLogger().info("Stop server request");
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "stop");
     }
 }
