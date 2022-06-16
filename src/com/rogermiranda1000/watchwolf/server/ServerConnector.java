@@ -13,13 +13,39 @@ import java.util.ArrayList;
 public class ServerConnector implements Runnable, ServerStartNotifier {
     public interface ArrayAdder { public void addToArray(ArrayList<Byte> out, Object []file); }
 
+    /**
+     * The only IP allowed to talk to the socket
+     */
     private final String allowedIp;
+
+    /**
+     * Socket to send server information to the ServersManager (server started/closed)
+     */
     private final Socket replySocket;
+
+    /**
+     * Socket to receive <allowedIp>'s requests
+     */
     private final ServerSocket serverSocket;
+
+    /**
+     * Client connected to <serverSocket>
+     */
     private Socket clientSocket;
 
+    /**
+     * Key used to identify this server, while sending server status replies to the ServersManager
+     */
     private final String replyKey;
+
+    /**
+     * Minecraft plugin; needed to run sync operations
+     */
     private final Plugin plugin;
+
+    /**
+     * Implementations of the server petitions
+     */
     private final ServerPetition serverPetition;
 
     public ServerConnector(String allowedIp, int port, Socket reply, String key, Plugin plugin, ServerPetition serverPetition) throws IOException {
@@ -68,13 +94,18 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
     private static String readString(DataInputStream dis) throws IOException {
         // TODO check if EOF
         // size
-        short size = (short) (dis.read() << 8); // MSB
-        size |= (short) dis.read(); // LSB
+        short size = (short) (dis.readByte() << 8); // MSB
+        size |= (short) dis.readByte(); // LSB
 
         // characters
         StringBuilder sb = new StringBuilder();
-        for (int n = 0; n < size; n++) sb.append((char)dis.read());
+        for (int n = 0; n < size; n++) sb.append((char)dis.readByte());
         return sb.toString();
+    }
+
+    private static short readShort(DataInputStream dis) throws IOException {
+        short msb = (short)((short)dis.readByte() << 8);
+        return (short)(msb | dis.readByte()); // LSB
     }
 
     /* server socket */
@@ -95,41 +126,55 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                     DataOutputStream dos = new DataOutputStream(this.clientSocket.getOutputStream());
 
                     byte first = dis.readByte();
-                    if (((first) >> 4) != (byte)0b0010) throw new UnexpectedPacket("The packet must start with '0010', found " + first);
-                    short group = (short)(dis.readByte() | (((short)first & 0b000_0_1111) << 8));
-                    switch (group) {
-                        case 0: // NOP
-                            // TODO extend timeout
-                            break;
-
-                        case 1:
-                            // TODO implement all
-                            switch (dis.readShort()) {
-                                case 0x0001:
-                                    Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
-                                        this.serverPetition.stopServer(null);
-                                        return null;
-                                    }); // TODO notify
-                                    break;
-
-                                case 0x0004:
-                                    Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
-                                        this.serverPetition.opPlayer(ServerConnector.readString(dis));
-                                        return null;
-                                    });
-                                    break;
-                            }
-                            break;
-
-                        default:
-                            // TODO send 'unimplemented'
-                    }
+                    if (((first) >> 4) != (byte)0b0010) throw new UnexpectedPacketException("The packet must start with '0010', found " + Integer.toBinaryString((first) >> 4) + " (" + Integer.toBinaryString(first) + ")");
+                    short group = (short)(dis.readByte() | (((short)first & 0b0000_1111) << 8));
+                    this.processGroup(group, dis, dos);
                 } catch (IOException e) {
                     e.printStackTrace();
-                } catch (UnexpectedPacket ex) {
+                } catch (UnexpectedPacketException ex) {
                     ex.printStackTrace();
                 }
             }
+        }
+    }
+
+    private void processGroup(short group, DataInputStream dis, DataOutputStream dos) throws IOException, UnexpectedPacketException {
+        switch (group) {
+            case 0: // NOP
+                // TODO extend timeout
+                break;
+
+            case 1:
+                this.processDefaultGroup(dis, dos);
+                break;
+
+            default:
+                // TODO send 'unimplemented'
+                System.out.println("Unimplemented group: " + group);
+        }
+    }
+
+    private void processDefaultGroup(DataInputStream dis, DataOutputStream dos) throws IOException, UnexpectedPacketException {
+        // TODO implement all
+        short operation = (short)(((short)dis.readByte() << 8) | dis.readByte());
+        switch (operation) {
+            case 0x0001:
+                Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
+                    this.serverPetition.stopServer(null);
+                    return null;
+                }); // TODO notify
+                break;
+
+            case 0x0004:
+                String nick = ServerConnector.readString(dis);
+                Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
+                    this.serverPetition.opPlayer(nick);
+                    return null;
+                });
+                break;
+
+            default:
+                throw new UnexpectedPacketException("Operation " + (int)operation + " from group 1"); // unimplemented by this version, or error
         }
     }
 
