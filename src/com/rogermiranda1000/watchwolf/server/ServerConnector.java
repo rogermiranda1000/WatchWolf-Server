@@ -156,6 +156,7 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
 
     private void processDefaultGroup(DataInputStream dis, DataOutputStream dos) throws IOException, UnexpectedPacketException {
         // TODO implement all
+        String nick;
         short operation = (short)(((short)dis.readByte() << 8) | dis.readByte());
         switch (operation) {
             case 0x0001:
@@ -165,8 +166,16 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                 }); // TODO notify
                 break;
 
+            case 0x0003:
+                nick = ServerConnector.readString(dis);
+                Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
+                    this.serverPetition.whitelistPlayer(nick);
+                    return null;
+                });
+                break;
+
             case 0x0004:
-                String nick = ServerConnector.readString(dis);
+                nick = ServerConnector.readString(dis);
                 Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
                     this.serverPetition.opPlayer(nick);
                     return null;
