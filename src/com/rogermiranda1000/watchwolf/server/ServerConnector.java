@@ -1,5 +1,6 @@
 package com.rogermiranda1000.watchwolf.server;
 
+import com.rogermiranda1000.watchwolf.entities.SocketHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -157,7 +158,7 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
     private void processDefaultGroup(DataInputStream dis, DataOutputStream dos) throws IOException, UnexpectedPacketException {
         // TODO implement all
         String nick;
-        short operation = (short)(((short)dis.readByte() << 8) | dis.readByte());
+        short operation = SocketHelper.readShort(dis);
         switch (operation) {
             case 0x0001:
                 Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
