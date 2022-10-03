@@ -8,4 +8,4 @@ Use Java **8**.
 
 ### Dependencies
 - spigot 1.16.5
-- WatchWolf Tester
+- WatchWolf Tester (export with .jar)
