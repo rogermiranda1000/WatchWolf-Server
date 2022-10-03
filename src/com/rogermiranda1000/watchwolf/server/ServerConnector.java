@@ -1,6 +1,9 @@
 package com.rogermiranda1000.watchwolf.server;
 
+import com.rogermiranda1000.watchwolf.entities.Position;
+import com.rogermiranda1000.watchwolf.entities.SocketData;
 import com.rogermiranda1000.watchwolf.entities.SocketHelper;
+import com.rogermiranda1000.watchwolf.entities.blocks.Block;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -158,6 +161,8 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
     private void processDefaultGroup(DataInputStream dis, DataOutputStream dos) throws IOException, UnexpectedPacketException {
         // TODO implement all
         String nick;
+        Position position;
+        Block block;
         short operation = SocketHelper.readShort(dis);
         switch (operation) {
             case 0x0001:
@@ -179,6 +184,32 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                 nick = ServerConnector.readString(dis);
                 Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
                     this.serverPetition.opPlayer(nick);
+                    return null;
+                });
+                break;
+
+            case 0x0005:
+                position = (Position) SocketData.readSocketData(dis, Position.class);
+                block = (Block) SocketData.readSocketData(dis, Block.class);
+                Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
+                    this.serverPetition.setBlock(position, block);
+                    return null;
+                });
+                break;
+
+            case 0x0006:
+                position = (Position) SocketData.readSocketData(dis, Position.class);
+                Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
+                    Block b = this.serverPetition.getBlock(position);
+
+                    // get block response header
+                    ArrayList<Byte> message = new ArrayList<>();
+                    message.add((byte) 0b001_1_0000);
+                    message.add((byte) 0b00000001);
+                    message.add((byte) 0x00);
+                    message.add((byte) 0x06);
+
+                    dos.write(SocketHelper.toByteArray(message), 0, message.size());
                     return null;
                 });
                 break;

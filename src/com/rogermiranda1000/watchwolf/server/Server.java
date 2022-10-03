@@ -1,6 +1,11 @@
 package com.rogermiranda1000.watchwolf.server;
 
+import com.rogermiranda1000.watchwolf.entities.Position;
+import com.rogermiranda1000.watchwolf.entities.blocks.Block;
+import com.rogermiranda1000.watchwolf.utils.SpigotToWatchWolfTranslator;
+import com.rogermiranda1000.watchwolf.utils.WatchWolfToSpigotTranslator;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -64,5 +69,17 @@ public class Server extends JavaPlugin implements ServerPetition {
     public void stopServer(ServerStopNotifier onServerStop) {
         getLogger().info("Stop server request");
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "stop");
+    }
+
+    @Override
+    public void setBlock(Position position, Block block) throws IOException {
+        WatchWolfToSpigotTranslator.getLocation(position)
+                .getBlock().setBlockData(WatchWolfToSpigotTranslator.getBlockData(block));
+    }
+
+    @Override
+    public Block getBlock(Position position) throws IOException {
+        Location loc = WatchWolfToSpigotTranslator.getLocation(position);
+        return SpigotToWatchWolfTranslator.getBlock(loc.getBlock());
     }
 }
