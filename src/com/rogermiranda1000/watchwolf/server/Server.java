@@ -24,6 +24,7 @@ public class Server extends JavaPlugin implements ServerPetition {
 
         try {
             getLogger().info("Hosting on " + port + " (for " + ip + ")");
+            getLogger().info("Reply to " + replyIP[0] + ":" + replyIP[1]);
             this.connector = new ServerConnector(ip, port, new Socket(replyIP[0], Integer.parseInt(replyIP[1])), config.getString("key"), this, this);
             this.connector.onServerStart();
             new Thread(this.connector).start();
