@@ -1,5 +1,6 @@
 package com.rogermiranda1000.watchwolf.server;
 
+import com.rogermiranda1000.watchwolf.entities.BlockReader;
 import com.rogermiranda1000.watchwolf.entities.Position;
 import com.rogermiranda1000.watchwolf.entities.SocketData;
 import com.rogermiranda1000.watchwolf.entities.SocketHelper;
@@ -60,6 +61,8 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
 
         this.replySocket = reply;
         this.replyKey = key;
+
+        SocketData.loadStaticBlock(BlockReader.class);
     }
 
     public void close() {
