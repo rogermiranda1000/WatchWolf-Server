@@ -31,7 +31,10 @@ public class Server extends JavaPlugin implements ServerPetition {
             getLogger().info("Hosting on " + port + " (for " + ip + ")");
             getLogger().info("Reply to " + replyIP[0] + ":" + replyIP[1]);
             this.connector = new ServerConnector(ip, port, new Socket(replyIP[0], Integer.parseInt(replyIP[1])), config.getString("key"), this, this);
+
             this.connector.onServerStart();
+            getLogger().info("Server started notified.");
+
             new Thread(this.connector).start();
         } catch (IOException e) {
             e.printStackTrace();
@@ -73,6 +76,7 @@ public class Server extends JavaPlugin implements ServerPetition {
 
     @Override
     public void setBlock(Position position, Block block) throws IOException {
+        getLogger().info("Set block " + block.getName() + " at " + position.toString() + " request");
         WatchWolfToSpigotTranslator.getLocation(position)
                 .getBlock().setBlockData(WatchWolfToSpigotTranslator.getBlockData(block));
     }
@@ -80,6 +84,8 @@ public class Server extends JavaPlugin implements ServerPetition {
     @Override
     public Block getBlock(Position position) throws IOException {
         Location loc = WatchWolfToSpigotTranslator.getLocation(position);
-        return SpigotToWatchWolfTranslator.getBlock(loc.getBlock());
+        Block found = SpigotToWatchWolfTranslator.getBlock(loc.getBlock());
+        getLogger().info("Get block at " + position.toString() + " request; Found " + found.getName());
+        return found;
     }
 }

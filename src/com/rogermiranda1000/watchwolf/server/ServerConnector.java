@@ -1,9 +1,6 @@
 package com.rogermiranda1000.watchwolf.server;
 
-import com.rogermiranda1000.watchwolf.entities.BlockReader;
-import com.rogermiranda1000.watchwolf.entities.Position;
-import com.rogermiranda1000.watchwolf.entities.SocketData;
-import com.rogermiranda1000.watchwolf.entities.SocketHelper;
+import com.rogermiranda1000.watchwolf.entities.*;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -132,9 +129,9 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                     DataInputStream dis = new DataInputStream(this.clientSocket.getInputStream());
                     DataOutputStream dos = new DataOutputStream(this.clientSocket.getOutputStream());
 
-                    byte first = dis.readByte();
+                    int first = dis.readUnsignedByte();
                     if (((first) >> 4) != (byte)0b0010) throw new UnexpectedPacketException("The packet must start with '0010', found " + Integer.toBinaryString((first) >> 4) + " (" + Integer.toBinaryString(first) + ")");
-                    short group = (short)(dis.readByte() | (((short)first & 0b0000_1111) << 8));
+                    short group = (short)(dis.readUnsignedByte() | (((short)first & 0b0000_1111) << 8));
                     this.processGroup(group, dis, dos);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -157,7 +154,7 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
 
             default:
                 // TODO send 'unimplemented'
-                System.out.println("Unimplemented group: " + group);
+                throw new UnexpectedPacketException("Unimplemented group: " + group);
         }
     }
 
@@ -204,15 +201,17 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                 position = (Position) SocketData.readSocketData(dis, Position.class);
                 Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
                     Block b = this.serverPetition.getBlock(position);
+                    Message msg = new Message(dos);
 
                     // get block response header
-                    ArrayList<Byte> message = new ArrayList<>();
-                    message.add((byte) 0b001_1_0000);
-                    message.add((byte) 0b00000001);
-                    message.add((byte) 0x00);
-                    message.add((byte) 0x06);
+                    msg.add((byte) 0b001_1_0000);
+                    msg.add((byte) 0b00000001);
+                    msg.add((byte) 0x00);
+                    msg.add((byte) 0x06);
 
-                    dos.write(SocketHelper.toByteArray(message), 0, message.size());
+                    msg.add(b);
+
+                    msg.send();
                     return null;
                 });
                 break;
