@@ -41,19 +41,19 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
     private final String replyKey;
 
     /**
-     * Minecraft plugin; needed to run sync operations
+     * Needed to run sync operations
      */
-    private final Plugin plugin;
+    private final SequentialExecutor executor;
 
     /**
      * Implementations of the server petitions
      */
     private final ServerPetition serverPetition;
 
-    public ServerConnector(String allowedIp, int port, Socket reply, String key, Plugin plugin, ServerPetition serverPetition) throws IOException {
+    public ServerConnector(String allowedIp, int port, Socket reply, String key, SequentialExecutor executor, ServerPetition serverPetition) throws IOException {
         this.allowedIp = allowedIp;
         this.serverSocket = new ServerSocket(port);
-        this.plugin = plugin;
+        this.executor = executor;
         this.serverPetition = serverPetition;
 
         this.replySocket = reply;
@@ -166,40 +166,28 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
         short operation = SocketHelper.readShort(dis);
         switch (operation) {
             case 0x0001:
-                Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
-                    this.serverPetition.stopServer(null);
-                    return null;
-                }); // TODO notify
+                this.executor.run(() -> this.serverPetition.stopServer(null));
                 break;
 
             case 0x0003:
                 nick = ServerConnector.readString(dis);
-                Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
-                    this.serverPetition.whitelistPlayer(nick);
-                    return null;
-                });
+                this.executor.run(() -> this.serverPetition.whitelistPlayer(nick));
                 break;
 
             case 0x0004:
                 nick = ServerConnector.readString(dis);
-                Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
-                    this.serverPetition.opPlayer(nick);
-                    return null;
-                });
+                this.executor.run(() -> this.serverPetition.opPlayer(nick));
                 break;
 
             case 0x0005:
                 position = (Position) SocketData.readSocketData(dis, Position.class);
                 block = (Block) SocketData.readSocketData(dis, Block.class);
-                Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
-                    this.serverPetition.setBlock(position, block);
-                    return null;
-                });
+                this.executor.run(() -> this.serverPetition.setBlock(position, block));
                 break;
 
             case 0x0006:
                 position = (Position) SocketData.readSocketData(dis, Position.class);
-                Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
+                this.executor.run(() -> {
                     Block b = this.serverPetition.getBlock(position);
                     Message msg = new Message(dos);
 
@@ -212,7 +200,6 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                     msg.add(b);
 
                     msg.send();
-                    return null;
                 });
                 break;
 

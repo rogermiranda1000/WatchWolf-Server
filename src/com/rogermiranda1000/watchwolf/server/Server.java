@@ -11,11 +11,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Server extends JavaPlugin implements ServerPetition {
+public class Server extends JavaPlugin implements ServerPetition, SequentialExecutor {
     private ServerConnector connector;
+
+    private final Queue<SequentialExecutor.ThrowableRunnable> futureExecute = new LinkedList<>();
+    private int futureExecuteTaskID;
 
     @Override
     public void onEnable() {
@@ -40,12 +45,34 @@ public class Server extends JavaPlugin implements ServerPetition {
             e.printStackTrace();
         }
 
+        // execute sequentially the orders one by one (and letting the server update)
+        this.futureExecuteTaskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
+            synchronized (this.futureExecute) {
+                if (this.futureExecute.isEmpty()) return;
+
+                SequentialExecutor.ThrowableRunnable run = this.futureExecute.remove();
+                try {
+                    run.run();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }, 0L, 1);
+
         // TODO events?
     }
 
     @Override
     public void onDisable() {
         this.connector.close();
+        Bukkit.getScheduler().cancelTask(this.futureExecuteTaskID);
+    }
+
+    @Override
+    public void run(SequentialExecutor.ThrowableRunnable run) {
+        synchronized (this.futureExecute) {
+            this.futureExecute.add(run);
+        }
     }
 
     private static boolean isUsername(String nick) {
