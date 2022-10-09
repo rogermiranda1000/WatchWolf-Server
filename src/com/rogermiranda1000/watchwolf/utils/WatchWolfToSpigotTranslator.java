@@ -26,6 +26,7 @@ public class WatchWolfToSpigotTranslator {
                     spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "half", "top");
                     spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "half", "upper");
                     spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "facing", "up");
+                    spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "vertical-direction", "up");
                     try {
                         doubleType = orientable.isSet(Orientable.Orientation.D); // both top and bottom
                     } catch (IllegalArgumentException ignore) {}
@@ -36,7 +37,60 @@ public class WatchWolfToSpigotTranslator {
                 }
                 else spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "up", "false");
             } catch (IllegalArgumentException ignore) {}
-            // TODO down, north, south, east, west
+
+            try {
+                if (orientable.isSet(Orientable.Orientation.D)) {
+                    spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "down", "true");
+                    spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "face", "floor");
+                    spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "half", "bottom");
+                    spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "half", "lower");
+                    spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "facing", "down");
+                    spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "vertical-direction", "down");
+                    // double already done on top
+                    // TODO orientation
+                }
+                else spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "down", "false");
+            } catch (IllegalArgumentException ignore) {}
+
+            try {
+                if (orientable.isSet(Orientable.Orientation.N)) {
+                    spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "north", "true");
+                    spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "facing", "north");
+                    // TODO orientation
+                    // TODO shape
+                }
+                else spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "north", "false");
+            } catch (IllegalArgumentException ignore) {}
+
+            try {
+                if (orientable.isSet(Orientable.Orientation.S)) {
+                    spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "south", "true");
+                    spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "facing", "south");
+                    // TODO orientation
+                    // TODO shape
+                }
+                else spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "south", "false");
+            } catch (IllegalArgumentException ignore) {}
+
+            try {
+                if (orientable.isSet(Orientable.Orientation.E)) {
+                    spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "east", "true");
+                    spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "facing", "east");
+                    // TODO orientation
+                    // TODO shape
+                }
+                else spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "east", "false");
+            } catch (IllegalArgumentException ignore) {}
+
+            try {
+                if (orientable.isSet(Orientable.Orientation.W)) {
+                    spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "west", "true");
+                    spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "facing", "west");
+                    // TODO orientation
+                    // TODO shape
+                }
+                else spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "west", "false");
+            } catch (IllegalArgumentException ignore) {}
         }
         // TODO others
 
