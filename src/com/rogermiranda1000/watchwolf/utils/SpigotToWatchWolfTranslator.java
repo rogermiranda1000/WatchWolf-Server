@@ -198,6 +198,7 @@ public class SpigotToWatchWolfTranslator {
         if (options.containsKey("attachment")) {
             if (options.get("attachment").contains("double_wall")) r.add(Directionable.Direction.DOUBLE_WALL);
             if (options.get("attachment").contains("single_wall")) r.add(Directionable.Direction.SINGLE_WALL);
+            if (options.get("attachment").contains("ceiling") || options.get("attachment").contains("floor")) r.add(Directionable.Direction.NONE);
         }
         return r;
     }
