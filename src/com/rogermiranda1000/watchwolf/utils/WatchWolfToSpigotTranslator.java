@@ -18,8 +18,8 @@ public class WatchWolfToSpigotTranslator {
         String spigotBlock = spigotMaterial.createBlockData().getAsString();
         if (watchWolfBlock instanceof Orientable) {
             boolean doubleType = false;
+            Orientable orientable = (Orientable)watchWolfBlock;
             try {
-                Orientable orientable = (Orientable)watchWolfBlock;
                 if (orientable.isSet(Orientable.Orientation.U)) {
                     spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "up", "true");
                     spigotBlock = WatchWolfToSpigotTranslator.setBlockDataProperty(spigotBlock, "face", "ceiling");
@@ -44,7 +44,7 @@ public class WatchWolfToSpigotTranslator {
     }
 
     private static String setBlockDataProperty(String blockData, String property, String value) {
-        return blockData.replaceAll("(?=[,\\[])" + property + "=[^,\\]]+", property + "=" + value);
+        return blockData.replaceAll("(?<=[,\\[])" + property + "=[^,\\]]+", property + "=" + value);
     }
 
     public static Location getLocation(Position pos) {

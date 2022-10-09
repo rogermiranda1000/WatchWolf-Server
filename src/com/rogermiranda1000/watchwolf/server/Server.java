@@ -6,6 +6,7 @@ import com.rogermiranda1000.watchwolf.utils.SpigotToWatchWolfTranslator;
 import com.rogermiranda1000.watchwolf.utils.WatchWolfToSpigotTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -103,16 +104,17 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
 
     @Override
     public void setBlock(Position position, Block block) throws IOException {
-        getLogger().info("Set block " + block.getName() + " at " + position.toString() + " request");
+        BlockData bd = WatchWolfToSpigotTranslator.getBlockData(block);
+        getLogger().info("Set block " + bd.getAsString() + " at " + position.toString() + " request");
         WatchWolfToSpigotTranslator.getLocation(position)
-                .getBlock().setBlockData(WatchWolfToSpigotTranslator.getBlockData(block));
+                .getBlock().setBlockData(bd);
     }
 
     @Override
     public Block getBlock(Position position) throws IOException {
         Location loc = WatchWolfToSpigotTranslator.getLocation(position);
         Block found = SpigotToWatchWolfTranslator.getBlock(loc.getBlock());
-        getLogger().info("Get block at " + position.toString() + " request; Found " + found.getName());
+        getLogger().info("Get block at " + position.toString() + " request; Found " + loc.getBlock().getBlockData());
         return found;
     }
 }
