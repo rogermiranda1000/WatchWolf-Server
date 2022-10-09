@@ -7,6 +7,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -133,10 +134,20 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                     if (((first) >> 4) != (byte)0b0010) throw new UnexpectedPacketException("The packet must start with '0010', found " + Integer.toBinaryString((first) >> 4) + " (" + Integer.toBinaryString(first) + ")");
                     short group = (short)(dis.readUnsignedByte() | (((short)first & 0b0000_1111) << 8));
                     this.processGroup(group, dis, dos);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (EOFException ignore) {
+                    break; // socket closed
+                } catch (IOException ex) {
+                    ex.printStackTrace();
                 } catch (UnexpectedPacketException ex) {
                     ex.printStackTrace();
+                }
+            }
+
+            if (this.clientSocket != null && !this.clientSocket.isClosed()) {
+                try {
+                    this.clientSocket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
