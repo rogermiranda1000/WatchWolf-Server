@@ -2,6 +2,7 @@ package com.rogermiranda1000.watchwolf.utils;
 
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
 import com.rogermiranda1000.watchwolf.entities.blocks.Blocks;
+import com.rogermiranda1000.watchwolf.entities.blocks.Directionable;
 import com.rogermiranda1000.watchwolf.entities.blocks.Orientable;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
@@ -28,8 +29,13 @@ public class SpigotToWatchWolfTranslator {
         Collection<Orientable.Orientation> orientations = SpigotToWatchWolfTranslator.getOrientations(arguments);
         if (orientations.size() > 0) {
             for (Orientable.Orientation orientation : Orientable.Orientation.values()) {
-                if (orientations.contains(orientation)) block = (Block)((Orientable)block).set(orientation);
+                if (orientations.contains(orientation)) block = (Block)((Orientable)block).setOrientation(orientation);
             }
+        }
+
+        Directionable.Direction direction = SpigotToWatchWolfTranslator.getDirection(arguments);
+        if (direction != null) {
+            block = (Block) ((Directionable)block).setDirection(direction);
         }
 
         // TODO others
@@ -129,6 +135,10 @@ public class SpigotToWatchWolfTranslator {
             if (options.get("face").contains("ceiling")) r.add(Orientable.Orientation.U);
             if (options.get("face").contains("floor")) r.add(Orientable.Orientation.D);
         }
+        if (options.containsKey("attachment")) {
+            if (options.get("attachment").contains("ceiling")) r.add(Orientable.Orientation.U);
+            if (options.get("attachment").contains("floor")) r.add(Orientable.Orientation.D);
+        }
         if (options.containsKey("half")) {
             if (options.get("half").contains("top") || options.get("half").contains("upper")) r.add(Orientable.Orientation.U);
             if (options.get("half").contains("bottom") || options.get("half").contains("upper")) r.add(Orientable.Orientation.D);
@@ -163,6 +173,31 @@ public class SpigotToWatchWolfTranslator {
             if (regexContains(options.get("shape"), "^south_") || options.get("shape").contains("north_south") || options.get("shape").contains("ascending_south")) r.add(Orientable.Orientation.S);
             if (regexContains(options.get("shape"), "^east_") || options.get("shape").contains("ascending_east") || options.get("shape").contains("east_west")) r.add(Orientable.Orientation.E);
             if (regexContains(options.get("shape"), "^west_") || options.get("shape").contains("ascending_west")) r.add(Orientable.Orientation.W);
+        }
+        return r;
+    }
+
+    private static Directionable.Direction getDirection(Map<String, String> options) {
+        HashMap<String, List<String>> arg = new HashMap<>();
+        for (Map.Entry<String,String> option : options.entrySet()) {
+            List<String> l = new ArrayList<>();
+            l.add(option.getValue());
+            arg.put(option.getKey(), l);
+        }
+        return SpigotToWatchWolfTranslator.getDirections(arg)
+                .stream().findFirst().orElse(null);
+    }
+
+    public static Collection<Directionable.Direction> getDirections(HashMap<String, List<String>> options) {
+        Collection<Directionable.Direction> r = new HashSet<>();
+        if (options.containsKey("axis")) {
+            if (options.get("axis").contains("x")) r.add(Directionable.Direction.X);
+            if (options.get("axis").contains("y")) r.add(Directionable.Direction.Y);
+            if (options.get("axis").contains("z")) r.add(Directionable.Direction.Z);
+        }
+        if (options.containsKey("attachment")) {
+            if (options.get("attachment").contains("double_wall")) r.add(Directionable.Direction.DOUBLE_WALL);
+            if (options.get("attachment").contains("single_wall")) r.add(Directionable.Direction.SINGLE_WALL);
         }
         return r;
     }
