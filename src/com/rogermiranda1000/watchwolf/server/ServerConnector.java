@@ -2,8 +2,6 @@ package com.rogermiranda1000.watchwolf.server;
 
 import com.rogermiranda1000.watchwolf.entities.*;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -131,8 +129,8 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                     DataOutputStream dos = new DataOutputStream(this.clientSocket.getOutputStream());
 
                     int first = dis.readUnsignedByte();
-                    if (((first) >> 4) != (byte)0b0010) throw new UnexpectedPacketException("The packet must start with '0010', found " + Integer.toBinaryString((first) >> 4) + " (" + Integer.toBinaryString(first) + ")");
-                    short group = (short)(dis.readUnsignedByte() | (((short)first & 0b0000_1111) << 8));
+                    if ((first & 0b1111) != 0b0001) throw new UnexpectedPacketException("The packet must end with '0_001', found " + Integer.toBinaryString(first & 0b1111) + " (" + Integer.toBinaryString(first) + ")");
+                    short group = (short)((dis.readUnsignedByte() << 4) | (first >> 4));
                     this.processGroup(group, dis, dos);
                 } catch (EOFException ignore) {
                     break; // socket closed
@@ -203,8 +201,8 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                     Message msg = new Message(dos);
 
                     // get block response header
-                    msg.add((byte) 0b001_1_0000);
-                    msg.add((byte) 0b00000001);
+                    msg.add((byte) 0b0001_1_001);
+                    msg.add((byte) 0b00000000);
                     msg.add((byte) 0x00);
                     msg.add((byte) 0x06);
 
@@ -226,8 +224,8 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
         ArrayList<Byte> message = new ArrayList<>();
 
         // op player header
-        message.add((byte) 0b001_1_0000);
-        message.add((byte) 0b00000001);
+        message.add((byte) 0b0001_1_001);
+        message.add((byte) 0b00000000);
         message.add((byte) 0x00);
         message.add((byte) 0x02);
 
