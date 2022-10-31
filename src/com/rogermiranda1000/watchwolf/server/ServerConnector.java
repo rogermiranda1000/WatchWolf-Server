@@ -89,7 +89,7 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
 
                     int first = dis.readUnsignedByte();
                     if ((first & 0b1111) != 0b0001) throw new UnexpectedPacketException("The packet must end with '0_001', found " + Integer.toBinaryString(first & 0b1111) + " (" + Integer.toBinaryString(first) + ")");
-                    short group = (short)((dis.readUnsignedByte() << 4) | (first >> 4));
+                    int group = ((dis.readUnsignedByte() << 4) | (first >> 4));
                     this.processGroup(group, dis, dos);
                 } catch (EOFException ignore) {
                     break; // socket closed
@@ -110,7 +110,7 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
         }
     }
 
-    private void processGroup(short group, DataInputStream dis, DataOutputStream dos) throws IOException, UnexpectedPacketException {
+    private void processGroup(int group, DataInputStream dis, DataOutputStream dos) throws IOException, UnexpectedPacketException {
         switch (group) {
             case 0: // NOP
                 // TODO extend timeout
@@ -186,7 +186,7 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
         message.add((byte) 0b00000000);
         message.add((short) 0x0002);
 
-        message.add(replyKey);
+        message.add(this.replyKey);
 
         message.send();
     }
