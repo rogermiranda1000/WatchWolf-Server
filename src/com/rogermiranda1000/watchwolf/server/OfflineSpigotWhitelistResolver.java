@@ -33,6 +33,6 @@ public class OfflineSpigotWhitelistResolver implements ServerWhitelistResolver, 
 
     @Override
     public void addToWhitelist(String name) {
-
+        this.whitelistedUsers.add(name);
     }
 }
