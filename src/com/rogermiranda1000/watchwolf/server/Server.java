@@ -6,6 +6,7 @@ import com.rogermiranda1000.watchwolf.utils.SpigotToWatchWolfTranslator;
 import com.rogermiranda1000.watchwolf.utils.WatchWolfToSpigotTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -86,14 +87,35 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
     public void opPlayer(String nick) {
         if (!Server.isUsername(nick)) return;
         getLogger().info("OP player (" + nick + ") request");
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "op " + nick);
+        OfflinePlayer player = this.getPlayer(nick);
+        if (player == null) {
+            // player never connected before; perform the query to the Mojang's servers
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "op " + nick);
+        }
+        else {
+            player.setOp(true);
+        }
     }
 
     @Override
     public void whitelistPlayer(String nick) {
         if (!Server.isUsername(nick)) return;
         getLogger().info("Whitelist player (" + nick + ") request");
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "whitelist add " + nick);
+        OfflinePlayer player = this.getPlayer(nick);
+        if (player == null) {
+            // player never connected before; perform the query to the Mojang's servers
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "whitelist add " + nick);
+        }
+        else {
+            player.setWhitelisted(true);
+        }
+    }
+
+    public OfflinePlayer getPlayer(String name) {
+        for (OfflinePlayer player : Bukkit.getOfflinePlayers()) { // TODO merge online players too?
+            if (player.getName().equals(name)) return player;
+        }
+        return null;
     }
 
     @Override
