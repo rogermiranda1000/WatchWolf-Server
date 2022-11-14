@@ -19,6 +19,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Server extends JavaPlugin implements ServerPetition, SequentialExecutor {
+    private ServerWhitelistResolver whitelistResolver;
+
     private ServerConnector connector;
 
     private final Queue<SequentialExecutor.ThrowableRunnable> futureExecute = new LinkedList<>();
@@ -26,6 +28,8 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
 
     @Override
     public void onEnable() {
+        this.whitelistResolver = new OfflineSpigotWhitelistResolver(this);
+
         getLogger().info("Loading socket data...");
 
         // read data
@@ -87,35 +91,14 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
     public void opPlayer(String nick) {
         if (!Server.isUsername(nick)) return;
         getLogger().info("OP player (" + nick + ") request");
-        OfflinePlayer player = this.getPlayer(nick);
-        if (player == null) {
-            // player never connected before; perform the query to the Mojang's servers
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "op " + nick);
-        }
-        else {
-            player.setOp(true);
-        }
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "op " + nick);
     }
 
     @Override
     public void whitelistPlayer(String nick) {
         if (!Server.isUsername(nick)) return;
         getLogger().info("Whitelist player (" + nick + ") request");
-        OfflinePlayer player = this.getPlayer(nick);
-        if (player == null) {
-            // player never connected before; perform the query to the Mojang's servers
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "whitelist add " + nick);
-        }
-        else {
-            player.setWhitelisted(true);
-        }
-    }
-
-    public OfflinePlayer getPlayer(String name) {
-        for (OfflinePlayer player : Bukkit.getOfflinePlayers()) { // TODO merge online players too?
-            if (player.getName().equals(name)) return player;
-        }
-        return null;
+        this.whitelistResolver.addToWhitelist(nick);
     }
 
     @Override
