@@ -6,9 +6,9 @@ import com.rogermiranda1000.watchwolf.utils.SpigotToWatchWolfTranslator;
 import com.rogermiranda1000.watchwolf.utils.WatchWolfToSpigotTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -99,6 +99,14 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
         if (!Server.isUsername(nick)) return;
         getLogger().info("Whitelist player (" + nick + ") request");
         this.whitelistResolver.addToWhitelist(nick);
+    }
+
+    @Override
+    public Position getPlayerPosition(String username) throws IOException {
+        Player p = Bukkit.getPlayer(username);
+        if (p == null) return null;
+        Location loc = p.getLocation();
+        return new Position(p.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ());
     }
 
     @Override
