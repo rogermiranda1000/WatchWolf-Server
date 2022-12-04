@@ -2,6 +2,7 @@ package com.rogermiranda1000.watchwolf.server;
 
 import com.rogermiranda1000.watchwolf.entities.*;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
+import com.rogermiranda1000.watchwolf.entities.items.Item;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -128,9 +129,10 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
 
     private void processDefaultGroup(DataInputStream dis, DataOutputStream dos) throws IOException, UnexpectedPacketException {
         // TODO implement all
-        String nick;
+        String nick, cmd;
         Position position;
         Block block;
+        Item item;
         int operation = SocketHelper.readShort(dis);
         switch (operation) {
             case 0x0001:
@@ -182,6 +184,34 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                     msg.add((short) 0x0007);
 
                     msg.add(playerPosition);
+
+                    msg.send();
+                });
+                break;
+
+            case 0x0008:
+                nick = SocketHelper.readString(dis);
+                item = (Item)SocketData.readSocketData(dis, Item.class);
+                this.executor.run(() -> this.serverPetition.giveItem(nick, item));
+                break;
+
+            case 0x0009:
+                cmd = SocketHelper.readString(dis);
+                this.executor.run(() -> this.serverPetition.runCommand(cmd));
+                break;
+
+            case 0x000A:
+                this.executor.run(() -> {
+                    String []users = this.serverPetition.getPlayers();
+                    Message msg = new Message(dos);
+
+                    // get block response header
+                    msg.add((byte) 0b0001_1_001);
+                    msg.add((byte) 0b00000000);
+                    msg.add((short) 0x000A);
+
+                    msg.add((short) users.length);
+                    for (int n = 0; n < users.length; n++) msg.add(users[n]);
 
                     msg.send();
                 });

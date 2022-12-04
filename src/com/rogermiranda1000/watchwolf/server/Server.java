@@ -2,6 +2,7 @@ package com.rogermiranda1000.watchwolf.server;
 
 import com.rogermiranda1000.watchwolf.entities.Position;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
+import com.rogermiranda1000.watchwolf.entities.items.Item;
 import com.rogermiranda1000.watchwolf.utils.SpigotToWatchWolfTranslator;
 import com.rogermiranda1000.watchwolf.utils.WatchWolfToSpigotTranslator;
 import org.bukkit.Bukkit;
@@ -81,6 +82,10 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
         }
     }
 
+    private void runSpigotCommand(String cmd) {
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+    }
+
     private static boolean isUsername(String nick) {
         Pattern pattern = Pattern.compile("^\\w{3,16}$"); // https://help.minecraft.net/hc/en-us/articles/4408950195341-Minecraft-Java-Edition-Username-VS-Gamertag-FAQ
         Matcher m = pattern.matcher(nick);
@@ -91,7 +96,7 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
     public void opPlayer(String nick) {
         if (!Server.isUsername(nick)) return;
         getLogger().info("OP player (" + nick + ") request");
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "op " + nick);
+        this.runSpigotCommand("op " + nick);
     }
 
     @Override
@@ -110,9 +115,26 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
     }
 
     @Override
+    public void giveItem(String s, Item item) throws IOException {
+        getLogger().info("Give " + item.toString() + " to " + s + " request");
+        Player p = Bukkit.getPlayer(s);
+        if (p == null) {
+            getLogger().info("Player " + s + " not found");
+            return;
+        }
+        p.getInventory().addItem(WatchWolfToSpigotTranslator.getItem(item));
+    }
+
+    @Override
+    public String[] getPlayers() throws IOException {
+        getLogger().info("Get players request");
+        return Bukkit.getOnlinePlayers().stream().map(p -> p.getName()).toArray(String[]::new);
+    }
+
+    @Override
     public void stopServer(ServerStopNotifier onServerStop) {
         getLogger().info("Stop server request");
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "stop");
+        this.runSpigotCommand("stop");
     }
 
     @Override
@@ -129,5 +151,11 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
         Block found = SpigotToWatchWolfTranslator.getBlock(loc.getBlock());
         getLogger().info("Get block at " + position.toString() + " request; Found " + loc.getBlock().getBlockData());
         return found;
+    }
+
+    @Override
+    public void runCommand(String cmd) throws IOException {
+        getLogger().info("Run " + cmd + " request");
+        this.runSpigotCommand(cmd);
     }
 }

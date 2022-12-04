@@ -4,10 +4,12 @@ import com.rogermiranda1000.watchwolf.entities.Position;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
 import com.rogermiranda1000.watchwolf.entities.blocks.Directionable;
 import com.rogermiranda1000.watchwolf.entities.blocks.Orientable;
+import com.rogermiranda1000.watchwolf.entities.items.Item;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * We need to convert WatchWolf blocks into Spigot's block
@@ -115,5 +117,9 @@ public class WatchWolfToSpigotTranslator {
 
     public static Location getLocation(Position pos) {
         return new Location(Bukkit.getWorld(pos.getWorld()), pos.getX(), pos.getY(), pos.getZ());
+    }
+
+    public static ItemStack getItem(Item item) {
+        return new ItemStack(Material.valueOf(item.getType().name()), item.getAmount());
     }
 }
