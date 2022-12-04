@@ -217,6 +217,20 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                 });
                 break;
 
+            case 0x000B:
+                this.executor.run(() -> {
+                    this.serverPetition.synchronize();
+                    Message msg = new Message(dos);
+
+                    // get block response header
+                    msg.add((byte) 0b0001_1_001);
+                    msg.add((byte) 0b00000000);
+                    msg.add((short) 0x000B);
+
+                    msg.send();
+                });
+                break;
+
             default:
                 throw new UnexpectedPacketException("Operation " + (int)operation + " from group 1"); // unimplemented by this version, or error
         }

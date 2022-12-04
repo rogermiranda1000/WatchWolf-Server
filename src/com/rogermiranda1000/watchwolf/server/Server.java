@@ -158,4 +158,7 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
         getLogger().info("Run " + cmd + " request");
         this.runSpigotCommand(cmd);
     }
+
+    @Override
+    public void synchronize() throws IOException {}
 }
