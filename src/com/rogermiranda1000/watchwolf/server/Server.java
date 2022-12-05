@@ -115,6 +115,20 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
     }
 
     @Override
+    public float getPlayerPitch(String username) throws IOException {
+        Player p = Bukkit.getPlayer(username);
+        if (p == null) return 0.0f;
+        return p.getLocation().getPitch();
+    }
+
+    @Override
+    public float getPlayerYaw(String username) throws IOException {
+        Player p = Bukkit.getPlayer(username);
+        if (p == null) return 0.0f;
+        return p.getLocation().getYaw();
+    }
+
+    @Override
     public void giveItem(String s, Item item) throws IOException {
         getLogger().info("Give " + item.toString() + " to " + s + " request");
         Player p = Bukkit.getPlayer(s);
@@ -123,6 +137,13 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
             return;
         }
         p.getInventory().addItem(WatchWolfToSpigotTranslator.getItem(item));
+    }
+
+    @Override
+    public void tp(String username, Position position) throws IOException {
+        Player p = Bukkit.getPlayer(username);
+        if (p == null) return;
+        p.teleport(WatchWolfToSpigotTranslator.getLocation(position));
     }
 
     @Override

@@ -231,6 +231,46 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                 });
                 break;
 
+            case 0x000C:
+                nick = SocketHelper.readString(dis);
+                position = (Position) SocketData.readSocketData(dis, Position.class);
+                this.executor.run(() -> this.serverPetition.tp(nick, position));
+                break;
+
+            case 0x000D:
+                nick = SocketHelper.readString(dis);
+                this.executor.run(() -> {
+                    float pitch = this.serverPetition.getPlayerPitch(nick);
+                    Message msg = new Message(dos);
+
+                    // get player pitch response header
+                    msg.add((byte) 0b0001_1_001);
+                    msg.add((byte) 0b00000000);
+                    msg.add((short) 0x000D);
+
+                    msg.add((double) pitch);
+
+                    msg.send();
+                });
+                break;
+
+            case 0x000E:
+                nick = SocketHelper.readString(dis);
+                this.executor.run(() -> {
+                    float yaw = this.serverPetition.getPlayerYaw(nick);
+                    Message msg = new Message(dos);
+
+                    // get player yaw response header
+                    msg.add((byte) 0b0001_1_001);
+                    msg.add((byte) 0b00000000);
+                    msg.add((short) 0x000E);
+
+                    msg.add((double) yaw);
+
+                    msg.send();
+                });
+                break;
+
             default:
                 throw new UnexpectedPacketException("Operation " + (int)operation + " from group 1"); // unimplemented by this version, or error
         }
