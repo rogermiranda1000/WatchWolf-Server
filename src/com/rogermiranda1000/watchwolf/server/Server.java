@@ -9,6 +9,7 @@ import com.rogermiranda1000.watchwolf.utils.SpigotToWatchWolfTranslator;
 import com.rogermiranda1000.watchwolf.utils.WatchWolfToSpigotTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -17,8 +18,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -199,9 +199,24 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
     }
 
     @Override
-    public Entity[] getEntities(Position position, double v) throws IOException {
+    public Entity[] getEntities(Position position, double radius) throws IOException {
         getLogger().info("Get entities request");
-        return new Entity[0]; // TODO
+        return this.getEntitiesByRadius(position, radius).stream().map(e -> SpigotToWatchWolfTranslator.getEntity(e))
+                .filter(Objects::nonNull).toArray(Entity[]::new);
+    }
+
+    public List<org.bukkit.entity.Entity> getEntitiesByRadius(Position position, double radius) {
+        ArrayList<org.bukkit.entity.Entity> r = new ArrayList<>();
+
+        World world = Bukkit.getWorld(position.getWorld());
+        if (world == null) return r; // no entities
+
+        for (org.bukkit.entity.Entity e : world.getEntities()) {
+            if (Math.abs(e.getLocation().getX() - position.getX()) <= radius
+                    && Math.abs(e.getLocation().getZ() - position.getZ()) <= radius) r.add(e); // inside the radius
+        }
+
+        return r;
     }
 
     @Override

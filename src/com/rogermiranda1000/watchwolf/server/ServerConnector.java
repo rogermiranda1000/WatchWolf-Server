@@ -3,6 +3,7 @@ package com.rogermiranda1000.watchwolf.server;
 import com.rogermiranda1000.watchwolf.entities.*;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
 import com.rogermiranda1000.watchwolf.entities.entities.Entity;
+import com.rogermiranda1000.watchwolf.entities.entities.EntityType;
 import com.rogermiranda1000.watchwolf.entities.items.Item;
 
 import java.io.DataInputStream;
@@ -61,6 +62,7 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
         this.replyKey = key;
 
         SocketData.loadStaticBlock(BlockReader.class);
+        SocketData.loadStaticBlock(EntityType.class);
     }
 
     public void close() {

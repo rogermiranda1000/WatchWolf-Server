@@ -1,13 +1,18 @@
 package com.rogermiranda1000.watchwolf.utils;
 
+import com.rogermiranda1000.watchwolf.entities.Position;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
 import com.rogermiranda1000.watchwolf.entities.blocks.Blocks;
 import com.rogermiranda1000.watchwolf.entities.blocks.Directionable;
 import com.rogermiranda1000.watchwolf.entities.blocks.Orientable;
+import com.rogermiranda1000.watchwolf.entities.entities.DroppedItem;
+import com.rogermiranda1000.watchwolf.entities.entities.Entity;
 import com.rogermiranda1000.watchwolf.entities.items.Item;
 import com.rogermiranda1000.watchwolf.entities.items.ItemType;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -218,5 +223,15 @@ public class SpigotToWatchWolfTranslator {
     public static Item getItem(ItemStack item) throws IllegalArgumentException {
         if (item == null) return null;
         return new Item(ItemType.valueOf(item.getType().name()), (byte)item.getAmount());
+    }
+
+    public static Position getPosition(Location loc) {
+        return new Position((loc.getWorld() == null) ? "" : loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ());
+    }
+
+    public static Entity getEntity(org.bukkit.entity.Entity e) {
+        if (e.getType().equals(EntityType.DROPPED_ITEM)) return new DroppedItem(e.getUniqueId().toString(), SpigotToWatchWolfTranslator.getPosition(e.getLocation()),
+                SpigotToWatchWolfTranslator.getItem(((org.bukkit.entity.Item)e).getItemStack()));
+        return null; // unknown entity; TODO
     }
 }
