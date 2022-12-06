@@ -1,7 +1,9 @@
 package com.rogermiranda1000.watchwolf.server;
 
+import com.rogermiranda1000.watchwolf.entities.Container;
 import com.rogermiranda1000.watchwolf.entities.Position;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
+import com.rogermiranda1000.watchwolf.entities.entities.Entity;
 import com.rogermiranda1000.watchwolf.entities.items.Item;
 import com.rogermiranda1000.watchwolf.utils.SpigotToWatchWolfTranslator;
 import com.rogermiranda1000.watchwolf.utils.WatchWolfToSpigotTranslator;
@@ -10,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -147,6 +150,16 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
     }
 
     @Override
+    public Container getInventory(String username) throws IOException {
+        Player p = Bukkit.getPlayer(username);
+        if (p == null) return null;
+        ItemStack []r = p.getInventory().getContents();
+        Item []items = new Item[r.length];
+        for (int n = 0; n < items.length; n++) items[n] = SpigotToWatchWolfTranslator.getItem(r[n]);
+        return new Container(items);
+    }
+
+    @Override
     public String[] getPlayers() throws IOException {
         getLogger().info("Get players request");
         return Bukkit.getOnlinePlayers().stream().map(p -> p.getName()).toArray(String[]::new);
@@ -178,6 +191,11 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
     public void runCommand(String cmd) throws IOException {
         getLogger().info("Run " + cmd + " request");
         this.runSpigotCommand(cmd);
+    }
+
+    @Override
+    public Entity[] getEntities(Position position, double v) throws IOException {
+        return new Entity[0]; // TODO
     }
 
     @Override

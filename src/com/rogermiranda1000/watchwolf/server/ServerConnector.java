@@ -2,6 +2,7 @@ package com.rogermiranda1000.watchwolf.server;
 
 import com.rogermiranda1000.watchwolf.entities.*;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
+import com.rogermiranda1000.watchwolf.entities.entities.Entity;
 import com.rogermiranda1000.watchwolf.entities.items.Item;
 
 import java.io.DataInputStream;
@@ -134,6 +135,7 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
         Block block;
         Item item;
         int operation = SocketHelper.readShort(dis);
+        double radius;
         switch (operation) {
             case 0x0001:
                 this.executor.run(() -> this.serverPetition.stopServer(null));
@@ -248,7 +250,7 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                     msg.add((byte) 0b00000000);
                     msg.add((short) 0x000D);
 
-                    msg.add((double) pitch);
+                    msg.add(pitch);
 
                     msg.send();
                 });
@@ -265,7 +267,43 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                     msg.add((byte) 0b00000000);
                     msg.add((short) 0x000E);
 
-                    msg.add((double) yaw);
+                    msg.add(yaw);
+
+                    msg.send();
+                });
+                break;
+
+            case 0x000F:
+                nick = SocketHelper.readString(dis);
+                this.executor.run(() -> {
+                    Container inv = this.serverPetition.getInventory(nick);
+                    Message msg = new Message(dos);
+
+                    // get player yaw response header
+                    msg.add((byte) 0b0001_1_001);
+                    msg.add((byte) 0b00000000);
+                    msg.add((short) 0x000F);
+
+                    msg.add(inv);
+
+                    msg.send();
+                });
+                break;
+
+            case 0x0010:
+                position = (Position) SocketData.readSocketData(dis, Position.class);
+                radius = SocketHelper.readDouble(dis);
+                this.executor.run(() -> {
+                    Entity []entities = this.serverPetition.getEntities(position, radius);
+                    Message msg = new Message(dos);
+
+                    // get player yaw response header
+                    msg.add((byte) 0b0001_1_001);
+                    msg.add((byte) 0b00000000);
+                    msg.add((short) 0x0010);
+
+                    msg.add((short) entities.length); // TODO move to helper
+                    for (int n = 0; n < entities.length; n++) msg.add(entities[n]);
 
                     msg.send();
                 });

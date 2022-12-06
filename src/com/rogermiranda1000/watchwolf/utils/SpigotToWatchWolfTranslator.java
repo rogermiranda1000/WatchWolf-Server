@@ -4,8 +4,11 @@ import com.rogermiranda1000.watchwolf.entities.blocks.Block;
 import com.rogermiranda1000.watchwolf.entities.blocks.Blocks;
 import com.rogermiranda1000.watchwolf.entities.blocks.Directionable;
 import com.rogermiranda1000.watchwolf.entities.blocks.Orientable;
+import com.rogermiranda1000.watchwolf.entities.items.Item;
+import com.rogermiranda1000.watchwolf.entities.items.ItemType;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -210,5 +213,9 @@ public class SpigotToWatchWolfTranslator {
             if (pattern.matcher(e).find()) return true;
         }
         return false;
+    }
+
+    public static Item getItem(ItemStack item) throws IllegalArgumentException {
+        return new Item(ItemType.valueOf(item.getType().name()), (byte)item.getAmount());
     }
 }
