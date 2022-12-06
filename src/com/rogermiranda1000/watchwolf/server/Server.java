@@ -111,6 +111,7 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
 
     @Override
     public Position getPlayerPosition(String username) throws IOException {
+        getLogger().info("Get " + username + "'s position request");
         Player p = Bukkit.getPlayer(username);
         if (p == null) return null;
         Location loc = p.getLocation();
@@ -119,6 +120,7 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
 
     @Override
     public float getPlayerPitch(String username) throws IOException {
+        getLogger().info("Get " + username + "'s pitch request");
         Player p = Bukkit.getPlayer(username);
         if (p == null) return 0.0f;
         return p.getLocation().getPitch();
@@ -126,6 +128,7 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
 
     @Override
     public float getPlayerYaw(String username) throws IOException {
+        getLogger().info("Get " + username + "'s yaw request");
         Player p = Bukkit.getPlayer(username);
         if (p == null) return 0.0f;
         return p.getLocation().getYaw();
@@ -144,6 +147,7 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
 
     @Override
     public void tp(String username, Position position) throws IOException {
+        getLogger().info("Tp " + username + " to " + position + " request");
         Player p = Bukkit.getPlayer(username);
         if (p == null) return;
         p.teleport(WatchWolfToSpigotTranslator.getLocation(position));
@@ -151,6 +155,7 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
 
     @Override
     public Container getInventory(String username) throws IOException {
+        getLogger().info("Get " + username + "'s inventory request");
         Player p = Bukkit.getPlayer(username);
         if (p == null) return null;
         ItemStack []r = p.getInventory().getContents();
@@ -195,6 +200,7 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
 
     @Override
     public Entity[] getEntities(Position position, double v) throws IOException {
+        getLogger().info("Get entities request");
         return new Entity[0]; // TODO
     }
 
