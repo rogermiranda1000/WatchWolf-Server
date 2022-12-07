@@ -3,5 +3,9 @@ Responsable to send the commands to the rest of the WatchWolf system to interact
 
 The Server is responsable of implementing WatchWolf Server's protocols. This concrete implementation will be developed using a Minecraft Plugin with Java.
 
-## Dependencies
+## Compile
+Use Java **8**.
+
+### Dependencies
 - spigot 1.16.5
+- WatchWolf Tester (export with .jar)
