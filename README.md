@@ -1,7 +1,9 @@
 # WatchWolf - Server
-Responsable to send the commands to the rest of the WatchWolf system to interact with the server. For more information about WatchWolf check TODO.
+Responsible to send the commands to the rest of the WatchWolf system to interact with the server. For more information about WatchWolf check the [WatchWolf website](https://watchwolf.dev/).
 
-The Server is responsable of implementing WatchWolf Server's protocols. This concrete implementation will be developed using a Minecraft Plugin with Java.
+The Server is responsible for implementing WatchWolf Server's protocols. This concrete implementation will be developed using a Minecraft Plugin with Java.
+
+You can download a pre-compiled version [here](https://watchwolf.dev/versions/).
 
 ## Compile
 Use Java **8**.
