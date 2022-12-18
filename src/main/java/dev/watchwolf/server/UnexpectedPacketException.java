@@ -1,4 +1,4 @@
-package com.rogermiranda1000.watchwolf.server;
+package dev.watchwolf.server;
 
 public class UnexpectedPacketException extends RuntimeException {
     public UnexpectedPacketException(String msg) {

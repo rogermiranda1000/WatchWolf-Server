@@ -1,0 +1,5 @@
+name: WatchWolf
+main: dev.watchwolf.server.Server
+version: "${project.version}"
+author: rogermiranda1000
+api-version: 1.13

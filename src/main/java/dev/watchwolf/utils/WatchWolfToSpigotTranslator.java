@@ -1,10 +1,10 @@
-package com.rogermiranda1000.watchwolf.utils;
+package dev.watchwolf.utils;
 
-import com.rogermiranda1000.watchwolf.entities.Position;
-import com.rogermiranda1000.watchwolf.entities.blocks.Block;
-import com.rogermiranda1000.watchwolf.entities.blocks.Directionable;
-import com.rogermiranda1000.watchwolf.entities.blocks.Orientable;
-import com.rogermiranda1000.watchwolf.entities.items.Item;
+import dev.watchwolf.entities.Position;
+import dev.watchwolf.entities.blocks.Block;
+import dev.watchwolf.entities.blocks.Directionable;
+import dev.watchwolf.entities.blocks.Orientable;
+import dev.watchwolf.entities.items.Item;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
