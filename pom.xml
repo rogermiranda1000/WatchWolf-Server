@@ -27,6 +27,7 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.16.5-R0.1-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -63,7 +64,7 @@
                 </configuration>
             </plugin>
 
-            <!-- TODO attach watchwolf-tester -->
+            <!-- attach watchwolf-tester -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -101,17 +102,13 @@
             <id>watchwolf-tester-repo</id>
             <url>https://maven.pkg.github.com/rogermiranda1000/watchwolf-tester</url>
         </repository>
-
-        <repository>
-            <id>watchwolf-server-repo</id>
-            <url>https://maven.pkg.github.com/rogermiranda1000/watchwolf-server</url>
-        </repository>
     </repositories>
 
-    <!--<distributionManagement>
+    <distributionManagement>
         <repository>
-            <id>watchwolf-server-repo</id>
+            <id>github</id>
+            <name>GitHub rogermiranda1000 Apache Maven Packages</name>
             <url>https://maven.pkg.github.com/rogermiranda1000/watchwolf-server</url>
         </repository>
-    </distributionManagement>-->
+    </distributionManagement>
 </project>
