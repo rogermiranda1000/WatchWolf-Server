@@ -1,12 +1,12 @@
-package com.rogermiranda1000.watchwolf.server;
+package dev.watchwolf.server;
 
-import com.rogermiranda1000.watchwolf.entities.Container;
-import com.rogermiranda1000.watchwolf.entities.Position;
-import com.rogermiranda1000.watchwolf.entities.blocks.Block;
-import com.rogermiranda1000.watchwolf.entities.entities.Entity;
-import com.rogermiranda1000.watchwolf.entities.items.Item;
-import com.rogermiranda1000.watchwolf.utils.SpigotToWatchWolfTranslator;
-import com.rogermiranda1000.watchwolf.utils.WatchWolfToSpigotTranslator;
+import dev.watchwolf.entities.Container;
+import dev.watchwolf.entities.Position;
+import dev.watchwolf.entities.blocks.Block;
+import dev.watchwolf.entities.entities.Entity;
+import dev.watchwolf.entities.items.Item;
+import dev.watchwolf.utils.SpigotToWatchWolfTranslator;
+import dev.watchwolf.utils.WatchWolfToSpigotTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;

@@ -1,4 +1,4 @@
-package com.rogermiranda1000.watchwolf.server;
+package dev.watchwolf.server;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

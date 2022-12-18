@@ -1,4 +1,4 @@
-package com.rogermiranda1000.watchwolf.server;
+package dev.watchwolf.server;
 
 import java.util.concurrent.Callable;
 

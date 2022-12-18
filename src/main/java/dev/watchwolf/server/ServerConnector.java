@@ -1,10 +1,10 @@
-package com.rogermiranda1000.watchwolf.server;
+package dev.watchwolf.server;
 
-import com.rogermiranda1000.watchwolf.entities.*;
-import com.rogermiranda1000.watchwolf.entities.blocks.Block;
-import com.rogermiranda1000.watchwolf.entities.entities.Entity;
-import com.rogermiranda1000.watchwolf.entities.entities.EntityType;
-import com.rogermiranda1000.watchwolf.entities.items.Item;
+import dev.watchwolf.entities.*;
+import dev.watchwolf.entities.blocks.Block;
+import dev.watchwolf.entities.entities.Entity;
+import dev.watchwolf.entities.entities.EntityType;
+import dev.watchwolf.entities.items.Item;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

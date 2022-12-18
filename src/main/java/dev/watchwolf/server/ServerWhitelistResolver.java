@@ -1,4 +1,4 @@
-package com.rogermiranda1000.watchwolf.server;
+package dev.watchwolf.server;
 
 public interface ServerWhitelistResolver {
     public void addToWhitelist(String name);
