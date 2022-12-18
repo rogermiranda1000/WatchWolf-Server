@@ -63,6 +63,13 @@
 
             <!-- TODO attach watchwolf-tester -->
         </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 
     <!-- TODO upload to github -->
