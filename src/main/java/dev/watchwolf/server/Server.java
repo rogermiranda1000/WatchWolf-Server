@@ -37,23 +37,10 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
         getLogger().info("Loading socket data...");
 
         // read data
-        FileConfiguration config = this.getConfig();
-        String ip = config.getString("target-ip");
-        int port = config.getInt("use-port");
-        String []replyIP = config.getString("reply").split(":");
-
-        try {
-            getLogger().info("Hosting on " + port + " (for " + ip + ")");
-            getLogger().info("Reply to " + replyIP[0] + ":" + replyIP[1]);
-            this.connector = new ServerConnector(ip, port, new Socket(replyIP[0], Integer.parseInt(replyIP[1])), config.getString("key"), this, this);
-
-            this.connector.onServerStart();
-            getLogger().info("Server started notified.");
-
-            new Thread(this.connector).start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        final FileConfiguration config = this.getConfig();
+        final String ip = config.getString("target-ip");
+        final int port = config.getInt("use-port");
+        final String []replyIP = config.getString("reply").split(":");
 
         // execute sequentially the orders one by one (and letting the server update)
         this.futureExecuteTaskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
@@ -68,6 +55,22 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
                 }
             }
         }, 0L, 1);
+
+        // notify back once the server has fully started
+        this.run(()->{
+            try {
+                getLogger().info("Hosting on " + port + " (for " + ip + ")");
+                getLogger().info("Reply to " + replyIP[0] + ":" + replyIP[1]);
+                this.connector = new ServerConnector(ip, port, new Socket(replyIP[0], Integer.parseInt(replyIP[1])), config.getString("key"), this, this);
+
+                this.connector.onServerStart();
+                getLogger().info("Server started notified.");
+
+                new Thread(this.connector).start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
 
         // TODO events?
     }
