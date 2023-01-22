@@ -211,6 +211,21 @@ public class SpigotToWatchWolfTranslator {
         return r;
     }
 
+    public static int getMaxAge(HashMap<String, List<String>> options) {
+        Collection<Directionable.Direction> r = new HashSet<>();
+        if (options.containsKey("axis")) {
+            if (options.get("axis").contains("x")) r.add(Directionable.Direction.X);
+            if (options.get("axis").contains("y")) r.add(Directionable.Direction.Y);
+            if (options.get("axis").contains("z")) r.add(Directionable.Direction.Z);
+        }
+        if (options.containsKey("attachment")) {
+            if (options.get("attachment").contains("double_wall")) r.add(Directionable.Direction.DOUBLE_WALL);
+            if (options.get("attachment").contains("single_wall")) r.add(Directionable.Direction.SINGLE_WALL);
+            if (options.get("attachment").contains("ceiling") || options.get("attachment").contains("floor")) r.add(Directionable.Direction.NONE);
+        }
+        return r;
+    }
+
     public static boolean regexContains(List<String> list, String regex) {
         Pattern pattern = Pattern.compile(regex);
 
