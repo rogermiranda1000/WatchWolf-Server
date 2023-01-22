@@ -19,7 +19,7 @@
         <dependency>
             <groupId>dev.watchwolf</groupId>
             <artifactId>watchwolf-tester</artifactId>
-            <version>0.1.5</version>
+            <version>LATEST</version>
             <scope>compile</scope>
         </dependency>
 
@@ -27,7 +27,8 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.16.5-R0.1-SNAPSHOT</version>
-            <scope>compile</scope>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/spigot-1.16.5.jar</systemPath>
         </dependency>
     </dependencies>
 
