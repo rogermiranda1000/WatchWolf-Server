@@ -43,6 +43,10 @@ public class SpigotToWatchWolfTranslator {
         return block;
     }
 
+    public static Set<String> getArguments(BlockData blockData) {
+        return SpigotToWatchWolfTranslator.getArgumentsAndProperty(blockData).keySet();
+    }
+
     /*   --- INTERNAL USE ONLY ---   */
 
     private static final Pattern blockDataData = Pattern.compile("minecraft:([^\\[]+)\\[(.+)\\]");
