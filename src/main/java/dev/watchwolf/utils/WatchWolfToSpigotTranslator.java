@@ -8,6 +8,7 @@ import dev.watchwolf.entities.blocks.Orientable;
 import dev.watchwolf.entities.blocks.transformer.AgeableTransformer;
 import dev.watchwolf.entities.blocks.transformer.DirectionableTransformer;
 import dev.watchwolf.entities.blocks.transformer.OrientableTransformer;
+import dev.watchwolf.entities.blocks.transformer.Transformers;
 import dev.watchwolf.entities.items.Item;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -24,13 +25,7 @@ public class WatchWolfToSpigotTranslator {
         if (spigotMaterial == null) throw new IllegalArgumentException("Couldn't find Spigot material " + watchWolfBlock.getName());
         String spigotBlock = spigotMaterial.createBlockData().getAsString();
 
-        // TODO do with reflection and a loop
-        if (watchWolfBlock instanceof Orientable) spigotBlock = OrientableTransformer.getInstance().modifyBlockData((Orientable) watchWolfBlock, spigotBlock);
-        if (watchWolfBlock instanceof Directionable) spigotBlock = DirectionableTransformer.getInstance().modifyBlockData((Directionable) watchWolfBlock, spigotBlock);
-        if (watchWolfBlock instanceof Ageable) spigotBlock = AgeableTransformer.getInstance().modifyBlockData((Ageable) watchWolfBlock, spigotBlock);
-        // TODO others
-
-        return Bukkit.createBlockData(spigotBlock);
+        return Bukkit.createBlockData(Transformers.getBlockData(watchWolfBlock, spigotBlock));
     }
 
     private static String setBlockDataProperty(String blockData, String property, String value) {

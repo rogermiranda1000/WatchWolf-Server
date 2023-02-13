@@ -5,6 +5,7 @@ import dev.watchwolf.entities.blocks.*;
 import dev.watchwolf.entities.blocks.transformer.AgeableTransformer;
 import dev.watchwolf.entities.blocks.transformer.DirectionableTransformer;
 import dev.watchwolf.entities.blocks.transformer.OrientableTransformer;
+import dev.watchwolf.entities.blocks.transformer.Transformers;
 import dev.watchwolf.entities.entities.DroppedItem;
 import dev.watchwolf.entities.entities.Entity;
 import dev.watchwolf.entities.items.Item;
@@ -34,13 +35,7 @@ public class SpigotToWatchWolfTranslator {
         Block block = SpigotToWatchWolfTranslator.getBlock(blockData.getMaterial());
         Map<String,String> arguments = getArgumentsAndProperty(blockData);
 
-        // TODO do with reflection and a loop
-        if (block instanceof Directionable) block = (Block) DirectionableTransformer.getInstance().applyPropertiesToBlock((Directionable) block, arguments);
-        if (block instanceof Orientable) block = (Block) OrientableTransformer.getInstance().applyPropertiesToBlock((Orientable) block, arguments);
-        if (block instanceof Ageable) block = (Block) AgeableTransformer.getInstance().applyPropertiesToBlock((Ageable) block, arguments);
-        // TODO others
-
-        return block;
+        return Transformers.getBlock(block, arguments);
     }
 
     public static Set<String> getArguments(BlockData blockData) {
