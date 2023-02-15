@@ -1,10 +1,11 @@
 package dev.watchwolf.utils;
 
 import dev.watchwolf.entities.Position;
-import dev.watchwolf.entities.blocks.Block;
-import dev.watchwolf.entities.blocks.Blocks;
-import dev.watchwolf.entities.blocks.Directionable;
-import dev.watchwolf.entities.blocks.Orientable;
+import dev.watchwolf.entities.blocks.*;
+import dev.watchwolf.entities.blocks.transformer.AgeableTransformer;
+import dev.watchwolf.entities.blocks.transformer.DirectionableTransformer;
+import dev.watchwolf.entities.blocks.transformer.OrientableTransformer;
+import dev.watchwolf.entities.blocks.transformer.Transformers;
 import dev.watchwolf.entities.entities.DroppedItem;
 import dev.watchwolf.entities.entities.Entity;
 import dev.watchwolf.entities.items.Item;
@@ -34,21 +35,11 @@ public class SpigotToWatchWolfTranslator {
         Block block = SpigotToWatchWolfTranslator.getBlock(blockData.getMaterial());
         Map<String,String> arguments = getArgumentsAndProperty(blockData);
 
-        Collection<Orientable.Orientation> orientations = SpigotToWatchWolfTranslator.getOrientations(arguments);
-        if (orientations.size() > 0) {
-            for (Orientable.Orientation orientation : Orientable.Orientation.values()) {
-                if (orientations.contains(orientation)) block = (Block)((Orientable)block).setOrientation(orientation);
-            }
-        }
+        return Transformers.getBlock(block, arguments);
+    }
 
-        Directionable.Direction direction = SpigotToWatchWolfTranslator.getDirection(arguments);
-        if (direction != null) {
-            block = (Block) ((Directionable)block).setDirection(direction);
-        }
-
-        // TODO others
-
-        return block;
+    public static Set<String> getArguments(BlockData blockData) {
+        return SpigotToWatchWolfTranslator.getArgumentsAndProperty(blockData).keySet();
     }
 
     /*   --- INTERNAL USE ONLY ---   */
@@ -114,110 +105,6 @@ public class SpigotToWatchWolfTranslator {
         }
 
         return arguments;
-    }
-
-    public static Set<String> getArguments(BlockData blockData) {
-        return SpigotToWatchWolfTranslator.getArgumentsAndProperty(blockData).keySet();
-    }
-
-    private static Collection<Orientable.Orientation> getOrientations(Map<String, String> options) {
-        HashMap<String, List<String>> arg = new HashMap<>();
-        for (Map.Entry<String,String> option : options.entrySet()) {
-            List<String> l = new ArrayList<>();
-            l.add(option.getValue());
-            arg.put(option.getKey(), l);
-        }
-        return SpigotToWatchWolfTranslator.getOrientations(arg);
-    }
-
-    public static Collection<Orientable.Orientation> getOrientations(HashMap<String, List<String>> options) {
-        Collection<Orientable.Orientation> r = new HashSet<>(); // TODO why duplicates?
-        if (options.containsKey("up")) r.add(Orientable.Orientation.U);
-        if (options.containsKey("hanging")) r.add(Orientable.Orientation.U);
-        if (options.containsKey("down")) r.add(Orientable.Orientation.D);
-        if (options.containsKey("north")) r.add(Orientable.Orientation.N);
-        if (options.containsKey("south")) r.add(Orientable.Orientation.S);
-        if (options.containsKey("east")) r.add(Orientable.Orientation.E);
-        if (options.containsKey("west")) r.add(Orientable.Orientation.W);
-        if (options.containsKey("face")) {
-            if (options.get("face").contains("ceiling")) r.add(Orientable.Orientation.U);
-            if (options.get("face").contains("floor")) r.add(Orientable.Orientation.D);
-        }
-        if (options.containsKey("attachment")) {
-            if (options.get("attachment").contains("ceiling")) r.add(Orientable.Orientation.U);
-            if (options.get("attachment").contains("floor")) r.add(Orientable.Orientation.D);
-        }
-        if (options.containsKey("half")) {
-            if (options.get("half").contains("top") || options.get("half").contains("upper")) r.add(Orientable.Orientation.U);
-            if (options.get("half").contains("bottom") || options.get("half").contains("upper")) r.add(Orientable.Orientation.D);
-        }
-        if (options.containsKey("facing")) {
-            if (options.get("facing").contains("up")) r.add(Orientable.Orientation.U);
-            if (options.get("facing").contains("down")) r.add(Orientable.Orientation.D);
-            if (options.get("facing").contains("north")) r.add(Orientable.Orientation.N);
-            if (options.get("facing").contains("south")) r.add(Orientable.Orientation.S);
-            if (options.get("facing").contains("east")) r.add(Orientable.Orientation.E);
-            if (options.get("facing").contains("west")) r.add(Orientable.Orientation.W);
-        }
-        if (options.containsKey("vertical-direction")) {
-            if (options.get("vertical-direction").contains("up")) r.add(Orientable.Orientation.U);
-            if (options.get("vertical-direction").contains("down")) r.add(Orientable.Orientation.D);
-        }
-        if (options.containsKey("type")) {
-            if (options.get("type").contains("top") || options.get("type").contains("double")) r.add(Orientable.Orientation.U);
-            if (options.get("type").contains("bottom") || options.get("type").contains("double")) r.add(Orientable.Orientation.D);
-        }
-        if (options.containsKey("orientation")) {
-            if (regexContains(options.get("orientation"), "^up_")) r.add(Orientable.Orientation.U);
-            if (regexContains(options.get("orientation"), "^down_")) r.add(Orientable.Orientation.D);
-            if (regexContains(options.get("orientation"), "_north$") || options.get("orientation").contains("north_up")) r.add(Orientable.Orientation.N);
-            if (regexContains(options.get("orientation"), "_south$") || options.get("orientation").contains("south_up")) r.add(Orientable.Orientation.S);
-            if (regexContains(options.get("orientation"), "_east$") || options.get("orientation").contains("east_up")) r.add(Orientable.Orientation.E);
-            if (regexContains(options.get("orientation"), "_west$") || options.get("orientation").contains("west_up")) r.add(Orientable.Orientation.W);
-        }
-        if (options.containsKey("shape")) {
-            if (regexContains(options.get("shape"), "^ascending_")) r.add(Orientable.Orientation.U);
-            if (regexContains(options.get("shape"), "^north_") || options.get("shape").contains("ascending_north")) r.add(Orientable.Orientation.N);
-            if (regexContains(options.get("shape"), "^south_") || options.get("shape").contains("north_south") || options.get("shape").contains("ascending_south")) r.add(Orientable.Orientation.S);
-            if (regexContains(options.get("shape"), "^east_") || options.get("shape").contains("ascending_east") || options.get("shape").contains("east_west")) r.add(Orientable.Orientation.E);
-            if (regexContains(options.get("shape"), "^west_") || options.get("shape").contains("ascending_west")) r.add(Orientable.Orientation.W);
-        }
-        return r;
-    }
-
-    private static Directionable.Direction getDirection(Map<String, String> options) {
-        HashMap<String, List<String>> arg = new HashMap<>();
-        for (Map.Entry<String,String> option : options.entrySet()) {
-            List<String> l = new ArrayList<>();
-            l.add(option.getValue());
-            arg.put(option.getKey(), l);
-        }
-        return SpigotToWatchWolfTranslator.getDirections(arg)
-                .stream().findFirst().orElse(null);
-    }
-
-    public static Collection<Directionable.Direction> getDirections(HashMap<String, List<String>> options) {
-        Collection<Directionable.Direction> r = new HashSet<>();
-        if (options.containsKey("axis")) {
-            if (options.get("axis").contains("x")) r.add(Directionable.Direction.X);
-            if (options.get("axis").contains("y")) r.add(Directionable.Direction.Y);
-            if (options.get("axis").contains("z")) r.add(Directionable.Direction.Z);
-        }
-        if (options.containsKey("attachment")) {
-            if (options.get("attachment").contains("double_wall")) r.add(Directionable.Direction.DOUBLE_WALL);
-            if (options.get("attachment").contains("single_wall")) r.add(Directionable.Direction.SINGLE_WALL);
-            if (options.get("attachment").contains("ceiling") || options.get("attachment").contains("floor")) r.add(Directionable.Direction.NONE);
-        }
-        return r;
-    }
-
-    public static boolean regexContains(List<String> list, String regex) {
-        Pattern pattern = Pattern.compile(regex);
-
-        for (String e : list) {
-            if (pattern.matcher(e).find()) return true;
-        }
-        return false;
     }
 
     public static Item getItem(ItemStack item) throws IllegalArgumentException {
