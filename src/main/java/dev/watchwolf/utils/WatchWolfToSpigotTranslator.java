@@ -1,13 +1,7 @@
 package dev.watchwolf.utils;
 
 import dev.watchwolf.entities.Position;
-import dev.watchwolf.entities.blocks.Ageable;
 import dev.watchwolf.entities.blocks.Block;
-import dev.watchwolf.entities.blocks.Directionable;
-import dev.watchwolf.entities.blocks.Orientable;
-import dev.watchwolf.entities.blocks.transformer.AgeableTransformer;
-import dev.watchwolf.entities.blocks.transformer.DirectionableTransformer;
-import dev.watchwolf.entities.blocks.transformer.OrientableTransformer;
 import dev.watchwolf.entities.blocks.transformer.Transformers;
 import dev.watchwolf.entities.items.Item;
 import org.bukkit.Bukkit;
