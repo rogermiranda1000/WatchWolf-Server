@@ -208,6 +208,16 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
                 .filter(Objects::nonNull).toArray(Entity[]::new);
     }
 
+    @Override
+    public void spawnEntity(Entity entity) throws IOException {
+        getLogger().info("Spawn " + entity.toString() + " request");
+        try {
+            WatchWolfToSpigotTranslator.spawnEntity(entity);
+        } catch (Exception ex) {
+            getLogger().warning(ex.getMessage());
+        }
+    }
+
     public List<org.bukkit.entity.Entity> getEntitiesByRadius(Position position, double radius) {
         ArrayList<org.bukkit.entity.Entity> r = new ArrayList<>();
 
