@@ -2,6 +2,7 @@ package dev.watchwolf.server;
 
 import dev.watchwolf.entities.*;
 import dev.watchwolf.entities.blocks.Block;
+import dev.watchwolf.entities.blocks.BlockReader;
 import dev.watchwolf.entities.entities.Entity;
 import dev.watchwolf.entities.entities.EntityType;
 import dev.watchwolf.entities.items.Item;
@@ -136,6 +137,7 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
         Position position;
         Block block;
         Item item;
+        Entity entity;
         int operation = SocketHelper.readShort(dis);
         double radius;
         switch (operation) {
@@ -306,6 +308,23 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
 
                     msg.add((short) entities.length); // TODO move to helper
                     for (int n = 0; n < entities.length; n++) msg.add(entities[n]);
+
+                    msg.send();
+                });
+                break;
+
+            case 0x0011:
+                entity = (Entity) Entity.readSocketData(dis, Entity.class);
+                this.executor.run(() -> {
+                    String uuid = this.serverPetition.spawnEntity(entity);
+                    Message msg = new Message(dos);
+
+                    // get player yaw response header
+                    msg.add((byte) 0b0001_1_001);
+                    msg.add((byte) 0b00000000);
+                    msg.add((short) 0x0011);
+
+                    msg.add(uuid);
 
                     msg.send();
                 });
