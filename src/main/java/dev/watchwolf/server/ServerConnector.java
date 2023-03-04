@@ -315,7 +315,19 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
 
             case 0x0011:
                 entity = (Entity) Entity.readSocketData(dis, Entity.class);
-                this.executor.run(() -> this.serverPetition.spawnEntity(entity));
+                this.executor.run(() -> {
+                    String uuid = this.serverPetition.spawnEntity(entity);
+                    Message msg = new Message(dos);
+
+                    // get player yaw response header
+                    msg.add((byte) 0b0001_1_001);
+                    msg.add((byte) 0b00000000);
+                    msg.add((short) 0x0011);
+
+                    msg.add(uuid);
+
+                    msg.send();
+                });
                 break;
 
             default:

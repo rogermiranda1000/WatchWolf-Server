@@ -42,7 +42,7 @@ public class WatchWolfToSpigotTranslator {
         return EntityType.valueOf(type.name());
     }
 
-    public static void spawnEntity(dev.watchwolf.entities.entities.Entity entity) throws IllegalArgumentException {
+    public static String spawnEntity(dev.watchwolf.entities.entities.Entity entity) throws IllegalArgumentException {
         World w = Bukkit.getWorld(entity.getPosition().getWorld());
         if (w == null) throw new IllegalArgumentException("World '" + entity.getPosition().getWorld() + "' not found");
 
@@ -51,7 +51,7 @@ public class WatchWolfToSpigotTranslator {
         Entity spawned;
         switch (entityType) {
             case DROPPED_ITEM:
-                w.dropItem(location, WatchWolfToSpigotTranslator.getItem(((DroppedItem)entity).getItem()));
+                spawned = w.dropItem(location, WatchWolfToSpigotTranslator.getItem(((DroppedItem)entity).getItem()));
 
                 // TODO other special cases
 
@@ -59,5 +59,7 @@ public class WatchWolfToSpigotTranslator {
                 spawned = w.spawnEntity(location, entityType);
                 // TODO apply other properties
         }
+
+        return spawned.getUniqueId().toString();
     }
 }

@@ -209,13 +209,14 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
     }
 
     @Override
-    public void spawnEntity(Entity entity) throws IOException {
+    public String spawnEntity(Entity entity) throws IOException {
         getLogger().info("Spawn " + entity.toString() + " request");
         try {
-            WatchWolfToSpigotTranslator.spawnEntity(entity);
+            return WatchWolfToSpigotTranslator.spawnEntity(entity);
         } catch (Exception ex) {
             getLogger().warning(ex.getMessage());
         }
+        return "";
     }
 
     public List<org.bukkit.entity.Entity> getEntitiesByRadius(Position position, double radius) {
