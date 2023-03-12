@@ -30,7 +30,7 @@ public class SpigotToWatchWolfTranslator {
 
     /*   --- BLOCK DATA TO BLOCK ---   */
 
-    public static Block getBlock(BlockData blockData) {
+    public static Block getBlock(BlockData blockData) { // TODO instead of `BlockData` use `MinecraftBlock`
         Block block = SpigotToWatchWolfTranslator.getBlock(blockData.getMaterial());
         Map<String,String> arguments = getArgumentsAndProperty(blockData);
 

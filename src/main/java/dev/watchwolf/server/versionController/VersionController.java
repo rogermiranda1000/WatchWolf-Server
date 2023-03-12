@@ -5,6 +5,7 @@ import dev.watchwolf.server.versionController.blocks.BlockPost13;
 import dev.watchwolf.server.versionController.blocks.BlockPre13;
 import dev.watchwolf.server.versionController.blocks.MinecraftBlock;
 import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
 
 /**
  * Singleton object for cross-version compatibility
@@ -49,5 +50,10 @@ public class VersionController implements BlockManager {
     @Override
     public MinecraftBlock getMaterial(String blockData) {
         return this.blockManager.getMaterial(blockData);
+    }
+
+    @Override
+    public MinecraftBlock getMaterial(Block block) {
+        return this.blockManager.getMaterial(block);
     }
 }

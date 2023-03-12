@@ -1,4 +1,5 @@
 package dev.watchwolf.server.versionController.blocks;
+import org.bukkit.block.Block;
 
 /**
  * BlockManager for version >= 1.13
@@ -9,6 +10,16 @@ public class BlockPost13 implements BlockManager {
     public MinecraftBlock getMaterial(String blockData) {
         try {
             return new MinecraftBlockPost13(blockData);
+        }
+        catch (IllegalArgumentException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public MinecraftBlock getMaterial(Block block) {
+        try {
+            return new MinecraftBlockPost13(block);
         }
         catch (IllegalArgumentException ex) {
             return null;

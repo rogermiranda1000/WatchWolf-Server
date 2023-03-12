@@ -27,7 +27,12 @@ public class MinecraftBlockPre13 extends MinecraftBlock {
     public MinecraftBlockPre13(String blockData) throws IllegalArgumentException {
         super(blockData);
 
-        this.type = new ItemStack(Material.valueOf(data[0]), 1, Short.parseShort(data[1]));
+        // TODO
+        this.type = null;//new ItemStack(Material.valueOf(data[0]), 1, Short.parseShort(data[1]));
+    }
+
+    public MinecraftBlockPre13(Block block) throws IllegalArgumentException {
+        this(MinecraftBlockPre13.staticBlockToBlockData(block));
     }
 
     @Override
@@ -35,5 +40,14 @@ public class MinecraftBlockPre13 extends MinecraftBlock {
         try {
             MinecraftBlockPre13.setTypeMethod.invoke(block, this.type.getType().getId(), this.type.getData().getData(), true); // TODO gravity
         } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException | NullPointerException ignored) {}
+    }
+
+    @Override
+    public String blockToBlockData(Block block) {
+        return MinecraftBlockPre13.staticBlockToBlockData(block);
+    }
+
+    public static String staticBlockToBlockData(Block block) {
+        return ""; // TODO
     }
 }
