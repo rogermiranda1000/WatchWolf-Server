@@ -4,8 +4,11 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="https://github.com/rogermiranda1000/Spigot-VersionController">https://github.com/rogermiranda1000/Spigot-VersionController</a>
@@ -14,6 +17,8 @@ public class MinecraftBlockPre13 extends MinecraftBlock {
     private final ItemStack type;
 
     private static final Method setTypeMethod = MinecraftBlockPre13.getSetTypeMethod();
+
+    private static List<BlockEquality> equalities;
 
     private static Method getSetTypeMethod() {
         try {
@@ -26,6 +31,15 @@ public class MinecraftBlockPre13 extends MinecraftBlock {
 
     public MinecraftBlockPre13(String blockData) throws IllegalArgumentException {
         super(blockData);
+
+        if (MinecraftBlockPre13.equalities == null) {
+            try {
+                MinecraftBlockPre13.equalities = BlockEquality.getAllBlockEqualities(getClass().getProtectionDomain().getCodeSource().getLocation().getPath(), "./blocks.json"); // to get the .jar folder I need an object instance
+            } catch (IOException e) {
+                e.printStackTrace();
+                MinecraftBlockPre13.equalities = new ArrayList<>();
+            }
+        }
 
         // TODO
         this.type = null;//new ItemStack(Material.valueOf(data[0]), 1, Short.parseShort(data[1]));
