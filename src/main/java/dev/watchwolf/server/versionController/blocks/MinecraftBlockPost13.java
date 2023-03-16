@@ -31,6 +31,10 @@ public class MinecraftBlockPost13 extends MinecraftBlock {
         this(MinecraftBlockPost13.staticBlockToBlockData(block));
     }
 
+    public MinecraftBlockPost13(Material material) throws IllegalArgumentException {
+        this(material.createBlockData().getAsString());
+    }
+
     @Override
     public void setType(Block block) {
         block.setBlockData(this.data);

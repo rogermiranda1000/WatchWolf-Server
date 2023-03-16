@@ -1,4 +1,5 @@
 package dev.watchwolf.server.versionController.blocks;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 /**
@@ -19,4 +20,11 @@ public interface BlockManager {
      * @return Material (null if IllegalArgumentException)
      */
     MinecraftBlock getMaterial(Block block);
+
+    /**
+     * Block material to material
+     * @param material Block material
+     * @return Material (null if IllegalArgumentException)
+     */
+    MinecraftBlock getMaterial(Material material);
 }

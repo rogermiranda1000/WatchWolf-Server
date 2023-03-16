@@ -1,4 +1,5 @@
 package dev.watchwolf.server.versionController.blocks;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 /**
@@ -19,6 +20,16 @@ public class BlockPre13 implements BlockManager {
     public MinecraftBlock getMaterial(Block block) {
         try {
             return new MinecraftBlockPre13(block);
+        }
+        catch (IllegalArgumentException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public MinecraftBlock getMaterial(Material material) {
+        try {
+            return new MinecraftBlockPre13(material);
         }
         catch (IllegalArgumentException ex) {
             return null;

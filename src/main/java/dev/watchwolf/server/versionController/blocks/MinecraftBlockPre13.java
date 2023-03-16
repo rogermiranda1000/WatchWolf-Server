@@ -49,6 +49,10 @@ public class MinecraftBlockPre13 extends MinecraftBlock {
         this(MinecraftBlockPre13.staticBlockToBlockData(block));
     }
 
+    public MinecraftBlockPre13(Material material) throws IllegalArgumentException {
+        this("minecraft:" + material.name().toLowerCase()); // TODO default block params?
+    }
+
     @Override
     public void setType(Block block) {
         try {

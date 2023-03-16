@@ -5,6 +5,7 @@ import dev.watchwolf.server.versionController.blocks.BlockPost13;
 import dev.watchwolf.server.versionController.blocks.BlockPre13;
 import dev.watchwolf.server.versionController.blocks.MinecraftBlock;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 /**
@@ -55,5 +56,10 @@ public class VersionController implements BlockManager {
     @Override
     public MinecraftBlock getMaterial(Block block) {
         return this.blockManager.getMaterial(block);
+    }
+
+    @Override
+    public MinecraftBlock getMaterial(Material material) {
+        return this.blockManager.getMaterial(material);
     }
 }

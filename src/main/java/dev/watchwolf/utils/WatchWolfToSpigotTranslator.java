@@ -22,7 +22,7 @@ public class WatchWolfToSpigotTranslator {
     public static MinecraftBlock getBlockData(Block watchWolfBlock) {
         Material spigotMaterial = Material.getMaterial(watchWolfBlock.getName());
         if (spigotMaterial == null) throw new IllegalArgumentException("Couldn't find Spigot material " + watchWolfBlock.getName());
-        String spigotBlock = spigotMaterial.createBlockData().getAsString();
+        String spigotBlock = VersionController.get().getMaterial(spigotMaterial).getBlockData();
 
         String blockData = Transformers.getBlockData(watchWolfBlock, spigotBlock);
         return VersionController.get().getMaterial(blockData);
