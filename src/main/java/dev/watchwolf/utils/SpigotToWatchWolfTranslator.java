@@ -9,6 +9,8 @@ import dev.watchwolf.entities.blocks.transformer.Transformers;
 import dev.watchwolf.entities.entities.*;
 import dev.watchwolf.entities.items.Item;
 import dev.watchwolf.entities.items.ItemType;
+import dev.watchwolf.server.versionController.VersionController;
+import dev.watchwolf.server.versionController.blocks.MinecraftBlock;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
@@ -20,34 +22,31 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SpigotToWatchWolfTranslator {
-    public static Block getBlock(org.bukkit.block.Block block) {
-        return SpigotToWatchWolfTranslator.getBlock(block.getBlockData());
-    }
-
     public static Block getBlock(Material material) {
         return Blocks.getBlock(material.name());
     }
 
     /*   --- BLOCK DATA TO BLOCK ---   */
 
-    public static Block getBlock(BlockData blockData) { // TODO instead of `BlockData` use `MinecraftBlock`
-        Block block = SpigotToWatchWolfTranslator.getBlock(blockData.getMaterial());
-        Map<String,String> arguments = getArgumentsAndProperty(blockData);
+    public static Block getBlock(org.bukkit.block.Block b) { // TODO instead of `BlockData` use `MinecraftBlock`
+        MinecraftBlock block = VersionController.get().getMaterial(b);
+        Block watchWolfBlock = SpigotToWatchWolfTranslator.getBlock(block.getMaterial());
+        Map<String,String> arguments = getArgumentsAndProperty(block.getBlockData());
 
-        return Transformers.getBlock(block, arguments);
+        return Transformers.getBlock(watchWolfBlock, arguments);
     }
 
-    public static Set<String> getArguments(BlockData blockData) {
+    public static Set<String> getArguments(String blockData) {
         return SpigotToWatchWolfTranslator.getArgumentsAndProperty(blockData).keySet();
     }
 
     /*   --- INTERNAL USE ONLY ---   */
 
     private static final Pattern blockDataData = Pattern.compile("minecraft:([^\\[]+)\\[(.+)\\]");
-    public static Map<String,String> getArgumentsAndProperty(BlockData blockData) {
+    public static Map<String,String> getArgumentsAndProperty(String blockData) {
         Map<String,String> arguments = new HashMap<>();
 
-        Matcher m = SpigotToWatchWolfTranslator.blockDataData.matcher(blockData.getAsString());
+        Matcher m = SpigotToWatchWolfTranslator.blockDataData.matcher(blockData);
         if (!m.find()) return arguments; // just a basic block
 
         String matName = m.group(1);

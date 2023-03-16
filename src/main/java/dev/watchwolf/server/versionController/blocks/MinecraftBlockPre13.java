@@ -34,7 +34,7 @@ public class MinecraftBlockPre13 extends MinecraftBlock {
 
         if (MinecraftBlockPre13.equalities == null) {
             try {
-                MinecraftBlockPre13.equalities = BlockEquality.getAllBlockEqualities(getClass().getProtectionDomain().getCodeSource().getLocation().getPath(), "./blocks.json"); // to get the .jar folder I need an object instance
+                MinecraftBlockPre13.equalities = BlockEquality.getAllBlockEqualities(getClass().getResourceAsStream("blocks.json")); // to get the .jar folder I need an object instance
             } catch (IOException e) {
                 e.printStackTrace();
                 MinecraftBlockPre13.equalities = new ArrayList<>();

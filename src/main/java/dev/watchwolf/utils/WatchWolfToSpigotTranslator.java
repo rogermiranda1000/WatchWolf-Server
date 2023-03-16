@@ -5,11 +5,12 @@ import dev.watchwolf.entities.blocks.Block;
 import dev.watchwolf.entities.blocks.transformer.Transformers;
 import dev.watchwolf.entities.entities.DroppedItem;
 import dev.watchwolf.entities.items.Item;
+import dev.watchwolf.server.versionController.VersionController;
+import dev.watchwolf.server.versionController.blocks.MinecraftBlock;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
@@ -18,12 +19,13 @@ import org.bukkit.inventory.ItemStack;
  * We need to convert WatchWolf blocks into Spigot's block
  */
 public class WatchWolfToSpigotTranslator {
-    public static BlockData getBlockData(Block watchWolfBlock) {
+    public static MinecraftBlock getBlockData(Block watchWolfBlock) {
         Material spigotMaterial = Material.getMaterial(watchWolfBlock.getName());
         if (spigotMaterial == null) throw new IllegalArgumentException("Couldn't find Spigot material " + watchWolfBlock.getName());
         String spigotBlock = spigotMaterial.createBlockData().getAsString();
 
-        return Bukkit.createBlockData(Transformers.getBlockData(watchWolfBlock, spigotBlock));
+        String blockData = Transformers.getBlockData(watchWolfBlock, spigotBlock);
+        return VersionController.get().getMaterial(blockData);
     }
 
     private static String setBlockDataProperty(String blockData, String property, String value) {

@@ -1,10 +1,8 @@
 package dev.watchwolf.server.versionController.blocks;
 
-import com.google.gson.Gson;
+import com.google.gson.*;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -43,35 +41,34 @@ public class BlockEquality {
 
     /**
      * Given a JSON with all the equalities between <1.13 blocks will get all equalities
-     * @param blockJsonPath Path to the downloaded <a href="https://gist.github.com/rogermiranda1000/6f6cafeacbf9c1da0043a583d15a313a">JSON</a>. Keep in mind this is from the root of the .jar
+     * @param blockJson Link to the downloaded <a href="https://gist.github.com/rogermiranda1000/6f6cafeacbf9c1da0043a583d15a313a">JSON</a>
      * @return List of all the elements inside the JSON, representing all the possible combinations of block equalities
      */
-    public static List<BlockEquality> getAllBlockEqualities(String jarPath, String blockJsonPath) throws IOException {
+    public static List<BlockEquality> getAllBlockEqualities(InputStream blockJson) throws IOException {
         List<BlockEquality> r = new ArrayList<>();
-        // TODO
-        getJSON(jarPath, blockJsonPath);
+
+        JsonArray objectArray = getJSON(blockJson);
+        for (JsonElement e : objectArray) {
+            JsonObject element = e.getAsJsonObject();
+
+            String blockData = element.get("base").getAsString();
+            String []id = element.get("default").getAsString().split(":");
+
+            r.add(new BlockEquality( blockData, Short.parseShort(id[0]), Byte.parseByte(id[1]) ));
+        }
+        System.out.println(r.toString());
+
         return r;
     }
 
-    private static void getJSON(String jarPath, String jsonPath) throws IOException {
-        final File jarFile = new File(jarPath);
-        File jsonFile = null;
+    private static JsonArray getJSON(InputStream blockJson) throws IOException {
+        JsonParser parser = new JsonParser();
+        Reader reader = new InputStreamReader(blockJson);
 
-        if(jarFile.isFile()) {  // Run with JAR file
-            final JarFile jar = new JarFile(jarFile);
-            final Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
-            while(entries.hasMoreElements() && jsonFile == null) {
-                final String name = entries.nextElement().getName();
-                //if (name.startsWith(jsonPath + "/")) { //filter according to the path
-                    System.out.println(name);
-                //}
-            }
-            jar.close();
-        }
+        JsonObject rootObj = parser.parse(reader).getAsJsonObject();
+        JsonArray locObj = rootObj.getAsJsonArray("blocks");
 
-        if (jsonFile == null) throw new IOException("JSON file '" + jsonPath + "' not found");
-        Gson gson = new Gson();
-        //gson.fromJson(new FileReader(jsonFile))
-        // TODO get array from '.blocks'
+        reader.close();
+        return locObj;
     }
 }

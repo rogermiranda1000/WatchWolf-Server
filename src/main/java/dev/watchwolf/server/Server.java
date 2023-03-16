@@ -5,6 +5,7 @@ import dev.watchwolf.entities.Position;
 import dev.watchwolf.entities.blocks.Block;
 import dev.watchwolf.entities.entities.Entity;
 import dev.watchwolf.entities.items.Item;
+import dev.watchwolf.server.versionController.blocks.MinecraftBlock;
 import dev.watchwolf.utils.SpigotToWatchWolfTranslator;
 import dev.watchwolf.utils.WatchWolfToSpigotTranslator;
 import org.bukkit.Bukkit;
@@ -181,10 +182,9 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
 
     @Override
     public void setBlock(Position position, Block block) throws IOException {
-        BlockData bd = WatchWolfToSpigotTranslator.getBlockData(block);
-        getLogger().info("Set block " + bd.getAsString() + " at " + position.toString() + " request");
-        WatchWolfToSpigotTranslator.getLocation(position)
-                .getBlock().setBlockData(bd);
+        MinecraftBlock b = WatchWolfToSpigotTranslator.getBlockData(block);
+        getLogger().info("Set block " + b.getBlockData() + " at " + position.toString() + " request");
+        b.setType(WatchWolfToSpigotTranslator.getLocation(position).getBlock());
     }
 
     @Override

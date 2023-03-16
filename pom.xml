@@ -6,7 +6,7 @@
 
     <groupId>dev.watchwolf</groupId>
     <artifactId>watchwolf-server</artifactId>
-    <version>0.1.10</version>
+    <version>0.1.14</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -26,9 +26,9 @@
         <dependency>
             <groupId>dev.watchwolf</groupId>
             <artifactId>watchwolf-tester</artifactId>
-            <version>0.1.10</version>
+            <version>0.1.12</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/watchwolf-tester-0.1.10.jar</systemPath>
+            <systemPath>${basedir}/lib/watchwolf-tester-0.1.12.jar</systemPath>
         </dependency>
 
         <dependency>
