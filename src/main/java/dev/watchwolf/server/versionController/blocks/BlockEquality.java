@@ -63,7 +63,7 @@ public class BlockEquality {
 
     private static JsonArray getJSON(InputStream blockJson) throws IOException {
         JsonParser parser = new JsonParser();
-        Reader reader = new InputStreamReader(blockJson);
+        Reader reader = new InputStreamReader(blockJson); // TODO NPE raised here
 
         JsonObject rootObj = parser.parse(reader).getAsJsonObject();
         JsonArray locObj = rootObj.getAsJsonArray("blocks");
