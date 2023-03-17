@@ -5,13 +5,11 @@ import dev.watchwolf.entities.Position;
 import dev.watchwolf.entities.blocks.Block;
 import dev.watchwolf.entities.entities.Entity;
 import dev.watchwolf.entities.items.Item;
-import dev.watchwolf.server.versionController.blocks.MinecraftBlock;
 import dev.watchwolf.utils.SpigotToWatchWolfTranslator;
 import dev.watchwolf.utils.WatchWolfToSpigotTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -182,16 +180,15 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
 
     @Override
     public void setBlock(Position position, Block block) throws IOException {
-        MinecraftBlock b = WatchWolfToSpigotTranslator.getBlockData(block);
-        getLogger().info("Set block " + b.getBlockData() + " at " + position.toString() + " request");
-        b.setType(WatchWolfToSpigotTranslator.getLocation(position).getBlock());
+        getLogger().info("Set block " + block.toString() + " at " + position.toString() + " request");
+        WatchWolfToSpigotTranslator.setBlockData(block, WatchWolfToSpigotTranslator.getLocation(position).getBlock());
     }
 
     @Override
     public Block getBlock(Position position) throws IOException {
         Location loc = WatchWolfToSpigotTranslator.getLocation(position);
         Block found = SpigotToWatchWolfTranslator.getBlock(loc.getBlock());
-        getLogger().info("Get block at " + position.toString() + " request; Found " + loc.getBlock().getBlockData());
+        getLogger().info("Get block at " + position.toString() + " request; Found " + found.toString());
         return found;
     }
 

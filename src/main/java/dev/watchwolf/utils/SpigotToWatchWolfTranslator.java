@@ -1,20 +1,13 @@
 package dev.watchwolf.utils;
 
+import com.cryptomorin.xseries.XMaterial;
 import dev.watchwolf.entities.Position;
 import dev.watchwolf.entities.blocks.*;
-import dev.watchwolf.entities.blocks.transformer.AgeableTransformer;
-import dev.watchwolf.entities.blocks.transformer.DirectionableTransformer;
-import dev.watchwolf.entities.blocks.transformer.OrientableTransformer;
 import dev.watchwolf.entities.blocks.transformer.Transformers;
 import dev.watchwolf.entities.entities.*;
 import dev.watchwolf.entities.items.Item;
 import dev.watchwolf.entities.items.ItemType;
-import dev.watchwolf.server.versionController.VersionController;
-import dev.watchwolf.server.versionController.blocks.MinecraftBlock;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -22,16 +15,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SpigotToWatchWolfTranslator {
-    public static Block getBlock(Material material) {
-        return Blocks.getBlock(material.name());
-    }
-
     /*   --- BLOCK DATA TO BLOCK ---   */
 
-    public static Block getBlock(org.bukkit.block.Block b) { // TODO instead of `BlockData` use `MinecraftBlock`
-        MinecraftBlock block = VersionController.get().getMaterial(b);
-        Block watchWolfBlock = SpigotToWatchWolfTranslator.getBlock(block.getMaterial());
-        Map<String,String> arguments = getArgumentsAndProperty(block.getBlockData());
+    public static Block getBlock(org.bukkit.block.Block b) {
+        XMaterial material = XMaterial.matchXMaterial(b.getType());
+        Block watchWolfBlock = Blocks.getBlock(material.name()); // the name will always be the last version material name (the one WatchWolf is based on)
+
+        String blockData;
+        // TODO <1.13
+        if (XMaterial.supports(13)) blockData = b.getBlockData().getAsString();
+        else blockData = "minecraft:" + watchWolfBlock.getName();
+
+        Map<String,String> arguments = getArgumentsAndProperty(blockData);
 
         return Transformers.getBlock(watchWolfBlock, arguments);
     }
