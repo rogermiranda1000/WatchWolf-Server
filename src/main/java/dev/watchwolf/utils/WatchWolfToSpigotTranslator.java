@@ -1,5 +1,7 @@
 package dev.watchwolf.utils;
 
+import com.cryptomorin.xseries.XBlock;
+import com.cryptomorin.xseries.XMaterial;
 import dev.watchwolf.entities.Position;
 import dev.watchwolf.entities.blocks.Block;
 import dev.watchwolf.entities.blocks.transformer.Transformers;
@@ -9,7 +11,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
@@ -18,12 +19,20 @@ import org.bukkit.inventory.ItemStack;
  * We need to convert WatchWolf blocks into Spigot's block
  */
 public class WatchWolfToSpigotTranslator {
-    public static BlockData getBlockData(Block watchWolfBlock) {
-        Material spigotMaterial = Material.getMaterial(watchWolfBlock.getName());
-        if (spigotMaterial == null) throw new IllegalArgumentException("Couldn't find Spigot material " + watchWolfBlock.getName());
-        String spigotBlock = spigotMaterial.createBlockData().getAsString();
+    public static void setBlockData(final Block watchWolfBlock, final org.bukkit.block.Block target) throws IllegalArgumentException {
+        XMaterial spigotMaterial = XMaterial.matchXMaterial(watchWolfBlock.getName())
+                .orElseThrow(() -> new IllegalArgumentException("Material '" + watchWolfBlock.getName() + "' not found"));
 
-        return Bukkit.createBlockData(Transformers.getBlockData(watchWolfBlock, spigotBlock));
+        // TODO to add blockData in <1.13 I'd have to work with XBlock class, but instead of `Block` constructor with a `BlockData` string
+        //      the constructor should call to XMaterial to get the material and then change the blockData
+        if (XMaterial.supports(13)) {
+            // we have blockData
+            String spigotBlock = Bukkit.createBlockData(spigotMaterial.parseMaterial()).getAsString();
+            String blockData = Transformers.getBlockData(watchWolfBlock, spigotBlock); // set the properties
+
+            target.setBlockData(Bukkit.createBlockData(blockData));
+        }
+        else XBlock.setType(target, spigotMaterial); // we just know the type
     }
 
     private static String setBlockDataProperty(String blockData, String property, String value) {

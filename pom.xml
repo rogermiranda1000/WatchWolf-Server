@@ -6,7 +6,7 @@
 
     <groupId>dev.watchwolf</groupId>
     <artifactId>watchwolf-server</artifactId>
-    <version>0.1.10</version>
+    <version>0.1.14</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -26,9 +26,9 @@
         <dependency>
             <groupId>dev.watchwolf</groupId>
             <artifactId>watchwolf-tester</artifactId>
-            <version>0.1.10</version>
+            <version>0.1.12</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/watchwolf-tester-0.1.10.jar</systemPath>
+            <systemPath>${basedir}/lib/watchwolf-tester-0.1.12.jar</systemPath>
         </dependency>
 
         <dependency>
@@ -37,6 +37,12 @@
             <version>1.16.5-R0.1-SNAPSHOT</version>
             <scope>system</scope>
             <systemPath>${basedir}/lib/spigot-1.16.5.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.cryptomorin</groupId>
+            <artifactId>XSeries</artifactId>
+            <version>LATEST</version>
         </dependency>
     </dependencies>
 
@@ -93,6 +99,28 @@
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- attach XSeries -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <configuration>
+                    <relocations>
+                        <relocation>
+                            <pattern>com.cryptomorin.xseries</pattern>
+                            <shadedPattern>dev.watchwolf.server.xseries</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
