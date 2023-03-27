@@ -3,6 +3,7 @@ package dev.watchwolf.server;
 import dev.watchwolf.entities.Container;
 import dev.watchwolf.entities.Position;
 import dev.watchwolf.entities.blocks.Block;
+import dev.watchwolf.entities.entities.Chicken;
 import dev.watchwolf.entities.entities.Entity;
 import dev.watchwolf.entities.items.Item;
 import dev.watchwolf.utils.SpigotToWatchWolfTranslator;
@@ -87,8 +88,11 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
         }
     }
 
-    private void runSpigotCommand(String cmd) {
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+    private String runSpigotCommand(String cmd) {
+        MessageInterceptingCommandRunner cmdRunner = new MessageInterceptingCommandRunner(Bukkit.getConsoleSender());
+        Bukkit.dispatchCommand(cmdRunner, cmd);
+
+        return cmdRunner.getMessageLogStripColor();
     }
 
     private static boolean isUsername(String nick) {
@@ -193,9 +197,9 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
     }
 
     @Override
-    public void runCommand(String cmd) throws IOException {
+    public String runCommand(String cmd) throws IOException {
         getLogger().info("Run " + cmd + " request");
-        this.runSpigotCommand(cmd);
+        return this.runSpigotCommand(cmd);
     }
 
     @Override
@@ -206,14 +210,21 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
     }
 
     @Override
-    public String spawnEntity(Entity entity) throws IOException {
+    public Entity spawnEntity(Entity entity) throws IOException {
         getLogger().info("Spawn " + entity.toString() + " request");
         try {
-            return WatchWolfToSpigotTranslator.spawnEntity(entity);
+            return SpigotToWatchWolfTranslator.getEntity(WatchWolfToSpigotTranslator.spawnEntity(entity));
         } catch (Exception ex) {
             getLogger().warning(ex.getMessage());
         }
-        return "";
+        return null;
+    }
+
+    @Override
+    public Entity getEntity(String uuid) throws IOException {
+        org.bukkit.entity.Entity e = Bukkit.getEntity(UUID.fromString(uuid));
+        if (e == null) return new Chicken("-1", new Position("",0,0,0)); // dummy entity
+        return SpigotToWatchWolfTranslator.getEntity(e);
     }
 
     public List<org.bukkit.entity.Entity> getEntitiesByRadius(Position position, double radius) {

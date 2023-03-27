@@ -51,7 +51,7 @@ public class WatchWolfToSpigotTranslator {
         return EntityType.valueOf(type.name());
     }
 
-    public static String spawnEntity(dev.watchwolf.entities.entities.Entity entity) throws IllegalArgumentException {
+    public static Entity spawnEntity(dev.watchwolf.entities.entities.Entity entity) throws IllegalArgumentException {
         World w = Bukkit.getWorld(entity.getPosition().getWorld());
         if (w == null) throw new IllegalArgumentException("World '" + entity.getPosition().getWorld() + "' not found");
 
@@ -69,6 +69,6 @@ public class WatchWolfToSpigotTranslator {
                 // TODO apply other properties
         }
 
-        return spawned.getUniqueId().toString();
+        return spawned;
     }
 }
