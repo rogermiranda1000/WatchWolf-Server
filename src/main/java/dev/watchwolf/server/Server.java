@@ -9,6 +9,7 @@ import dev.watchwolf.entities.entities.Entity;
 import dev.watchwolf.entities.items.Item;
 import dev.watchwolf.utils.SpigotToWatchWolfTranslator;
 import dev.watchwolf.utils.WatchWolfToSpigotTranslator;
+import org.apache.logging.log4j.LogManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -30,10 +31,17 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
 
     private final Queue<SequentialExecutor.ThrowableRunnable> futureExecute = new LinkedList<>();
     private int futureExecuteTaskID;
+    private CommandRunner commandRunner;
 
     @Override
     public void onEnable() {
         this.whitelistResolver = new OfflineSpigotWhitelistResolver(this);
+
+        // get the logger
+        final org.apache.logging.log4j.core.Logger logger = (org.apache.logging.log4j.core.Logger) LogManager.getRootLogger();
+        LogAppender appender = new LogAppender(this);
+        logger.addAppender(appender);
+        this.commandRunner = appender;
 
         getLogger().info("Loading socket data...");
 
@@ -90,10 +98,7 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
     }
 
     private String runSpigotCommand(String cmd) {
-        MessageInterceptingCommandRunner cmdRunner = new MessageInterceptingCommandRunner(Bukkit.getConsoleSender());
-        Bukkit.dispatchCommand(cmdRunner, cmd);
-
-        return cmdRunner.getMessageLogStripColor();
+        return this.commandRunner.runCommand(cmd);
     }
 
     private static boolean isUsername(String nick) {
