@@ -200,7 +200,9 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
     @Override
     public String runCommand(String cmd) throws IOException {
         getLogger().info("Run " + cmd + " request");
-        return this.runSpigotCommand(cmd);
+        String r = this.runSpigotCommand(cmd);
+        if (!r.isEmpty()) getLogger().info("In response of '" + cmd + "', got: " + r);
+        return r;
     }
 
     @Override
