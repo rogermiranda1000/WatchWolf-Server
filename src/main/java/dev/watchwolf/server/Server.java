@@ -1,5 +1,6 @@
 package dev.watchwolf.server;
 
+import com.cryptomorin.xseries.XMaterial;
 import dev.watchwolf.entities.Container;
 import dev.watchwolf.entities.Position;
 import dev.watchwolf.entities.blocks.Block;
@@ -222,7 +223,24 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
 
     @Override
     public Entity getEntity(String uuid) throws IOException {
-        org.bukkit.entity.Entity e = Bukkit.getEntity(UUID.fromString(uuid));
+        org.bukkit.entity.Entity e = null;
+
+        if (XMaterial.supports(12)) e = Bukkit.getEntity(UUID.fromString(uuid)); // we have Bukkit.getEntity
+        else {
+            // @author https://www.spigotmc.org/threads/get-entity-from-uuid.65446/
+            for (World world : Bukkit.getWorlds()) {
+                for (org.bukkit.entity.Entity entity : world.getEntities()) {
+                    if (entity.getUniqueId().equals(uuid)) {
+                        e = entity;
+                        break;
+                    }
+                }
+
+                if (e != null) break;
+            }
+        }
+
+
         if (e == null) return new Chicken("-1", new Position("",0,0,0)); // dummy entity
         return SpigotToWatchWolfTranslator.getEntity(e);
     }
