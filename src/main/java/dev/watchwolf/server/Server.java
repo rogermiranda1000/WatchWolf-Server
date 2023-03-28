@@ -1,12 +1,15 @@
 package dev.watchwolf.server;
 
+import com.cryptomorin.xseries.XMaterial;
 import dev.watchwolf.entities.Container;
 import dev.watchwolf.entities.Position;
 import dev.watchwolf.entities.blocks.Block;
+import dev.watchwolf.entities.entities.Chicken;
 import dev.watchwolf.entities.entities.Entity;
 import dev.watchwolf.entities.items.Item;
 import dev.watchwolf.utils.SpigotToWatchWolfTranslator;
 import dev.watchwolf.utils.WatchWolfToSpigotTranslator;
+import org.apache.logging.log4j.LogManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -28,10 +31,17 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
 
     private final Queue<SequentialExecutor.ThrowableRunnable> futureExecute = new LinkedList<>();
     private int futureExecuteTaskID;
+    private CommandRunner commandRunner;
 
     @Override
     public void onEnable() {
         this.whitelistResolver = new OfflineSpigotWhitelistResolver(this);
+
+        // get the logger
+        final org.apache.logging.log4j.core.Logger logger = (org.apache.logging.log4j.core.Logger) LogManager.getRootLogger();
+        LogAppender appender = new LogAppender(this);
+        logger.addAppender(appender);
+        this.commandRunner = appender;
 
         getLogger().info("Loading socket data...");
 
@@ -87,8 +97,8 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
         }
     }
 
-    private void runSpigotCommand(String cmd) {
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+    private String runSpigotCommand(String cmd) {
+        return this.commandRunner.runCommand(cmd);
     }
 
     private static boolean isUsername(String nick) {
@@ -193,9 +203,11 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
     }
 
     @Override
-    public void runCommand(String cmd) throws IOException {
+    public String runCommand(String cmd) throws IOException {
         getLogger().info("Run " + cmd + " request");
-        this.runSpigotCommand(cmd);
+        String r = this.runSpigotCommand(cmd);
+        if (!r.isEmpty()) getLogger().info("In response of '" + cmd + "', got: " + r);
+        return r;
     }
 
     @Override
@@ -206,14 +218,38 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
     }
 
     @Override
-    public String spawnEntity(Entity entity) throws IOException {
+    public Entity spawnEntity(Entity entity) throws IOException {
         getLogger().info("Spawn " + entity.toString() + " request");
         try {
-            return WatchWolfToSpigotTranslator.spawnEntity(entity);
+            return SpigotToWatchWolfTranslator.getEntity(WatchWolfToSpigotTranslator.spawnEntity(entity));
         } catch (Exception ex) {
             getLogger().warning(ex.getMessage());
         }
-        return "";
+        return null;
+    }
+
+    @Override
+    public Entity getEntity(String uuid) throws IOException {
+        org.bukkit.entity.Entity e = null;
+
+        if (XMaterial.supports(12)) e = Bukkit.getEntity(UUID.fromString(uuid)); // we have Bukkit.getEntity
+        else {
+            // @author https://www.spigotmc.org/threads/get-entity-from-uuid.65446/
+            for (World world : Bukkit.getWorlds()) {
+                for (org.bukkit.entity.Entity entity : world.getEntities()) {
+                    if (entity.getUniqueId().equals(uuid)) {
+                        e = entity;
+                        break;
+                    }
+                }
+
+                if (e != null) break;
+            }
+        }
+
+
+        if (e == null) return new Chicken("-1", new Position("",0,0,0)); // dummy entity
+        return SpigotToWatchWolfTranslator.getEntity(e);
     }
 
     public List<org.bukkit.entity.Entity> getEntitiesByRadius(Position position, double radius) {

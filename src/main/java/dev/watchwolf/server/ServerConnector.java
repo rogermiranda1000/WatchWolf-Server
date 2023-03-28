@@ -133,7 +133,7 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
 
     private void processDefaultGroup(DataInputStream dis, DataOutputStream dos) throws IOException, UnexpectedPacketException {
         // TODO implement all
-        String nick, cmd;
+        String nick, cmd, uuid;
         Position position;
         Block block;
         Item item;
@@ -203,7 +203,19 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
 
             case 0x0009:
                 cmd = SocketHelper.readString(dis);
-                this.executor.run(() -> this.serverPetition.runCommand(cmd));
+                this.executor.run(() -> {
+                    String response = this.serverPetition.runCommand(cmd);
+                    Message msg = new Message(dos);
+
+                    // run cmd response header
+                    msg.add((byte) 0b0001_1_001);
+                    msg.add((byte) 0b00000000);
+                    msg.add((short) 0x0009);
+
+                    msg.add(response);
+
+                    msg.send();
+                });
                 break;
 
             case 0x000A:
@@ -316,15 +328,32 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
             case 0x0011:
                 entity = (Entity) Entity.readSocketData(dis, Entity.class);
                 this.executor.run(() -> {
-                    String uuid = this.serverPetition.spawnEntity(entity);
+                    Entity e = this.serverPetition.spawnEntity(entity);
                     Message msg = new Message(dos);
 
-                    // get player yaw response header
+                    // get entities response header
                     msg.add((byte) 0b0001_1_001);
                     msg.add((byte) 0b00000000);
                     msg.add((short) 0x0011);
 
-                    msg.add(uuid);
+                    msg.add(e);
+
+                    msg.send();
+                });
+                break;
+
+            case 0x0012:
+                uuid = SocketHelper.readString(dis);
+                this.executor.run(() -> {
+                    Entity e = this.serverPetition.getEntity(uuid);
+                    Message msg = new Message(dos);
+
+                    // get entity response header
+                    msg.add((byte) 0b0001_1_001);
+                    msg.add((byte) 0b00000000);
+                    msg.add((short) 0x0012);
+
+                    msg.add(e);
 
                     msg.send();
                 });
