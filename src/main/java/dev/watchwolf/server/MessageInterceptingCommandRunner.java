@@ -7,7 +7,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.NotImplementedException;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
@@ -79,14 +78,10 @@ public class MessageInterceptingCommandRunner implements ConsoleCommandSender {
     }
 
     @Override
-    public void sendMessage(UUID uuid, String s) {
-        throw new NotImplementedException("sendMessage uuid-string not implemented");
-    }
+    public void sendMessage(UUID uuid, String s) { }
 
     @Override
-    public void sendMessage(UUID uuid, String[] strings) {
-        throw new NotImplementedException("sendMessage uuid-string[] not implemented");
-    }
+    public void sendMessage(UUID uuid, String[] strings) { }
 
     @Override
     public Server getServer() {
@@ -135,9 +130,7 @@ public class MessageInterceptingCommandRunner implements ConsoleCommandSender {
     }
 
     @Override
-    public void sendRawMessage(UUID uuid, String s) {
-        throw new NotImplementedException("sendRawMessage uuid-string not implemented");
-    }
+    public void sendRawMessage(UUID uuid, String s) { }
 
     @Override
     public boolean isPermissionSet(String name) {
