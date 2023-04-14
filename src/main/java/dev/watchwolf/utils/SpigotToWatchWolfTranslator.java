@@ -28,7 +28,7 @@ public class SpigotToWatchWolfTranslator {
 
         Map<String,String> arguments = getArgumentsAndProperty(blockData);
 
-        return Transformers.getBlock(watchWolfBlock, arguments);
+        return Transformers.getInstance().applyPropertiesToBlock(watchWolfBlock, arguments);
     }
 
     public static Set<String> getArguments(String blockData) {

@@ -28,7 +28,7 @@ public class WatchWolfToSpigotTranslator {
         if (XMaterial.supports(13)) {
             // we have blockData
             String spigotBlock = Bukkit.createBlockData(spigotMaterial.parseMaterial()).getAsString();
-            String blockData = Transformers.getBlockData(watchWolfBlock, spigotBlock); // set the properties
+            String blockData = Transformers.getInstance().modifyAllBlockData(watchWolfBlock, spigotBlock); // set the properties
 
             target.setBlockData(Bukkit.createBlockData(blockData));
         }

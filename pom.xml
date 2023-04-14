@@ -6,7 +6,7 @@
 
     <groupId>dev.watchwolf</groupId>
     <artifactId>watchwolf-server</artifactId>
-    <version>0.1.16</version>
+    <version>0.1.18</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -26,9 +26,9 @@
         <dependency>
             <groupId>dev.watchwolf</groupId>
             <artifactId>watchwolf-tester</artifactId>
-            <version>0.1.16</version>
+            <version>0.1.18</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/watchwolf-tester-0.1.16.jar</systemPath>
+            <systemPath>${basedir}/lib/watchwolf-tester-0.1.18.jar</systemPath>
         </dependency>
 
         <dependency>
@@ -47,7 +47,7 @@
     </dependencies>
 
     <build>
-        <finalName>WatchWolf-${project.version}-1.8-1.19</finalName>
+        <finalName>WatchWolf-${project.version}-1.8-1.19.4</finalName>
 
         <pluginManagement>
             <plugins>
