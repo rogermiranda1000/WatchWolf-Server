@@ -1,4 +1,4 @@
-# WatchWolf - Server
+# WatchWolf - Server [![CodeFactor](https://www.codefactor.io/repository/github/rogermiranda1000/watchwolf-server/badge/dev)](https://www.codefactor.io/repository/github/rogermiranda1000/watchwolf-server/overview/dev)
 Responsible to send the commands to the rest of the WatchWolf system to interact with the server. For more information about WatchWolf check the [WatchWolf website](https://watchwolf.dev/).
 
 The Server is responsible for implementing WatchWolf Server's protocols. This concrete implementation will be developed using a Minecraft Plugin with Java.
