@@ -143,7 +143,9 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
         getLogger().info("Get " + username + "'s yaw request");
         Player p = Bukkit.getPlayer(username);
         if (p == null) return 0.0f;
-        return p.getLocation().getYaw();
+        float yaw = p.getLocation().getYaw();
+        if (yaw > 180f) yaw -= 360f; // Minecraft does this
+        return yaw;
     }
 
     @Override
