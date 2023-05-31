@@ -8,7 +8,7 @@ import dev.watchwolf.entities.entities.Chicken;
 import dev.watchwolf.entities.entities.Entity;
 import dev.watchwolf.entities.items.Item;
 import dev.watchwolf.server.worldguard.UnimplementedWorldGuardManager;
-import dev.watchwolf.server.worldguard.WorldGuardManager;
+import dev.watchwolf.server.worldguard.WorldGuardManagerFactory;
 import dev.watchwolf.utils.SpigotToWatchWolfTranslator;
 import dev.watchwolf.utils.WatchWolfToSpigotTranslator;
 import org.apache.logging.log4j.LogManager;
@@ -60,7 +60,7 @@ public class Server extends JavaPlugin implements ServerPetition, WorldGuardServ
         // extended petitions managers
         PluginManager pm = this.getServer().getPluginManager();
         Plugin worldguard = pm.getPlugin("WorldGuard");
-        if (worldguard != null) this.worldGuardManager = new WorldGuardManager(this, worldguard);
+        if (worldguard != null) this.worldGuardManager = WorldGuardManagerFactory.build(this, worldguard);
         else this.worldGuardManager = new UnimplementedWorldGuardManager();
 
         // execute sequentially the orders one by one (and letting the server update)
