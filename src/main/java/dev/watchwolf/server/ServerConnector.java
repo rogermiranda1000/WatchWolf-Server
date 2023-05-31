@@ -53,11 +53,17 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
      */
     private final ServerPetition serverPetition;
 
-    public ServerConnector(String allowedIp, int port, Socket reply, String key, SequentialExecutor executor, ServerPetition serverPetition) throws IOException {
+    /**
+     * Implementations of the server petitions
+     */
+    private final WorldGuardServerPetition wgServerPetition;
+
+    public ServerConnector(String allowedIp, int port, Socket reply, String key, SequentialExecutor executor, ServerPetition serverPetition, WorldGuardServerPetition wgServerPetition) throws IOException {
         this.allowedIp = allowedIp;
         this.serverSocket = new ServerSocket(port);
         this.executor = executor;
         this.serverPetition = serverPetition;
+        this.wgServerPetition = wgServerPetition;
 
         this.replySocket = reply;
         this.replyKey = key;
@@ -123,6 +129,10 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
 
             case 1:
                 this.processDefaultGroup(dis, dos);
+                break;
+
+            case 3:
+                this.processWorldGuard(dis, dos);
                 break;
 
             default:
@@ -361,6 +371,64 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
 
             default:
                 throw new UnexpectedPacketException("Operation " + (int)operation + " from group 1"); // unimplemented by this version, or error
+        }
+    }
+
+
+    private void processWorldGuard(DataInputStream dis, DataOutputStream dos) throws IOException, UnexpectedPacketException {
+        String name;
+        Position pos1, pos2;
+
+        int operation = SocketHelper.readShort(dis);
+        switch (operation) {
+            case 0x0001:
+                name = SocketHelper.readString(dis);
+                pos1 = (Position) SocketData.readSocketData(dis, Position.class);
+                pos2 = (Position) SocketData.readSocketData(dis, Position.class);
+
+                this.executor.run(() -> this.wgServerPetition.createRegion(name, pos1, pos2));
+                break;
+
+            case 0x0002:
+                this.executor.run(() -> {
+                    String []regions = this.wgServerPetition.getRegions();
+                    Message msg = new Message(dos);
+
+                    // get entity response header
+                    msg.add((byte) 0b0011_1_001);
+                    msg.add((byte) 0b00000000);
+                    msg.add((short) 0x0002);
+
+                    // TODO move to helper
+                    msg.add((short) regions.length);
+                    for (String region : regions) msg.add(region);
+
+                    msg.send();
+                });
+                break;
+
+            case 0x0003:
+                pos1 = (Position) SocketData.readSocketData(dis, Position.class);
+
+                this.executor.run(() -> {
+                    String []regions = this.wgServerPetition.getRegions(pos1);
+                    Message msg = new Message(dos);
+
+                    // get entity response header
+                    msg.add((byte) 0b0011_1_001);
+                    msg.add((byte) 0b00000000);
+                    msg.add((short) 0x0003);
+
+                    // TODO move to helper
+                    msg.add((short) regions.length);
+                    for (String region : regions) msg.add(region);
+
+                    msg.send();
+                });
+                break;
+
+            default:
+                throw new UnexpectedPacketException("Operation " + (int)operation + " from group 3"); // unimplemented by this version, or error
         }
     }
 
