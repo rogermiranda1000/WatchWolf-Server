@@ -105,7 +105,7 @@ public class WorldGuardManager extends ExtendedPetitionManager implements WorldG
             Method vectorBuilder = vectorClass.getDeclaredMethod("at", double.class, double.class, double.class);
             Class<?> worldManagerClass = Class.forName("com.sk89q.worldguard.protection.managers.RegionManager");
             Class<?> applicableRegionSetClass = Class.forName("com.sk89q.worldguard.protection.ApplicableRegionSet");
-            Method getRegions = worldManagerClass.getDeclaredMethod("getRegions");
+            Method getRegions = applicableRegionSetClass.getDeclaredMethod("getRegions");
             final Class<?> protectedRegionClass = Class.forName("com.sk89q.worldguard.protection.regions.ProtectedRegion");
             final Method getProtectedRegionId = protectedRegionClass.getDeclaredMethod("getId");
 
@@ -119,7 +119,7 @@ public class WorldGuardManager extends ExtendedPetitionManager implements WorldG
                 )).stream()
                     .map(r -> {
                         try {
-                            return (int)getProtectedRegionId.invoke(protectedRegionClass.cast(r));
+                            return (String)getProtectedRegionId.invoke(protectedRegionClass.cast(r));
                         } catch (Exception ex) {
                             throw new RuntimeException(ex);
                         }
