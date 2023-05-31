@@ -285,16 +285,21 @@ public class Server extends JavaPlugin implements ServerPetition, WorldGuardServ
 
     @Override
     public void createRegion(String s, Position firstPosition, Position secondPosition) throws IOException {
+        getLogger().info("Requesting a new WorldGuard region (" + s + "), in " + firstPosition.toString() + ", " + secondPosition.toString());
         this.worldGuardManager.createRegion(s, firstPosition, secondPosition);
     }
 
     @Override
     public String[] getRegions() throws IOException {
-        return this.worldGuardManager.getRegions();
+        String[] r = this.worldGuardManager.getRegions();
+        getLogger().info("WorldGuard list request, got " + Arrays.asList(r).toString());
+        return r;
     }
 
     @Override
     public String[] getRegions(Position position) throws IOException {
-        return this.worldGuardManager.getRegions(position);
+        String[] r = this.worldGuardManager.getRegions(position);
+        getLogger().info("WorldGuard list at pos=" + position.toString() + " request, got " + Arrays.asList(r).toString());
+        return r;
     }
 }
