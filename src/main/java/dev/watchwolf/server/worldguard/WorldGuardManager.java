@@ -1,10 +1,5 @@
 package dev.watchwolf.server.worldguard;
 
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.protection.regions.RegionContainer;
 import dev.watchwolf.entities.Position;
 import dev.watchwolf.server.ExtendedPetitionManager;
 import dev.watchwolf.server.WorldGuardServerPetition;
@@ -15,13 +10,44 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class WorldGuardManager extends ExtendedPetitionManager implements WorldGuardServerPetition {
     public WorldGuardManager(JavaPlugin watchwolf, Plugin plugin) {
         super(watchwolf, plugin);
+    }
+
+    /**
+     * Get the WorldGuard manager of that Bukkit world
+     * @param world World to get the manager
+     * @return World manager (com.sk89q.worldguard.protection.managers.RegionManager)
+     */
+    private Object getWorldManager(World world) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, IllegalArgumentException {
+        Class<?> worldGuardClass = Class.forName("com.sk89q.worldguard.WorldGuard");
+        Class<?> platformClass = Class.forName("com.sk89q.worldguard.internal.platform.WorldGuardPlatform");
+        Class<?> regionContainerClass = Class.forName("com.sk89q.worldguard.protection.regions.RegionContainer");
+        Method getWGInstance = worldGuardClass.getDeclaredMethod("getInstance");
+        Method getWGPlatform = worldGuardClass.getDeclaredMethod("getPlatform");
+        Method getPlatformRegionContainer = platformClass.getDeclaredMethod("getRegionContainer");
+
+        Object container = getPlatformRegionContainer.invoke(
+                platformClass.cast(getWGPlatform.invoke(
+                    worldGuardClass.cast(getWGInstance.invoke(null))
+                ))
+        );
+
+
+        Class<?> bukkitAdapterClass = Class.forName("com.sk89q.worldedit.bukkit.BukkitAdapter");
+        Method adaptBukkitWorldToWorldGuards = bukkitAdapterClass.getDeclaredMethod("adapt", World.class);
+        Class<?> wgWorldClass = Class.forName("com.sk89q.worldedit.world.World");
+
+        Method getContainerRegion = regionContainerClass.getDeclaredMethod("get", wgWorldClass);
+        return getContainerRegion.invoke(regionContainerClass.cast(container), wgWorldClass.cast(adaptBukkitWorldToWorldGuards.invoke(null, world)));
     }
 
     @Override
@@ -32,22 +58,17 @@ public class WorldGuardManager extends ExtendedPetitionManager implements WorldG
         if (positionWorld == null) throw new IllegalArgumentException("The world specified doesn't exists.");
 
         try {
-            Class<?> bukkitAdapter = Class.forName("com.sk89q.worldedit.bukkit.BukkitAdapter");
-            Method adaptBukkitWorldToWorldGuards = bukkitAdapter.getDeclaredMethod("adapt", World.class);
-            Class<?> wgWorld = Class.forName("com.sk89q.worldedit.world.World");
             Class<?> vectorClass = Class.forName("com.sk89q.worldedit.math.BlockVector3");
             Method vectorBuilder = vectorClass.getDeclaredMethod("at", double.class, double.class, double.class);
             Class<?> protectedRegionClass = Class.forName("com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion");
             Constructor<?> protectedRegionBuilder = protectedRegionClass.getConstructor(String.class, vectorClass, vectorClass);
+            Class<?> worldManagerClass = Class.forName("com.sk89q.worldguard.protection.managers.RegionManager");
+            Method addRegion = worldManagerClass.getDeclaredMethod("addRegion", Class.forName("com.sk89q.worldguard.protection.regions.ProtectedRegion"));
 
-            RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-            Method getContainerRegion = container.getClass().getDeclaredMethod("get", wgWorld);
-            RegionManager worldManager = (RegionManager)getContainerRegion.invoke(container, wgWorld.cast(adaptBukkitWorldToWorldGuards.invoke(null, positionWorld)));
-
-            ProtectedCuboidRegion region = (ProtectedCuboidRegion)protectedRegionBuilder.newInstance(s,
+            Object region = protectedRegionBuilder.newInstance(s,
                             vectorClass.cast(vectorBuilder.invoke(null, position.getX(), position.getY(), position.getZ())),
                             vectorClass.cast(vectorBuilder.invoke(null, position1.getX(), position1.getY(), position1.getZ())));
-            worldManager.addRegion(region);
+            addRegion.invoke(worldManagerClass.cast(this.getWorldManager(positionWorld)), protectedRegionClass.cast(region));
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -58,15 +79,14 @@ public class WorldGuardManager extends ExtendedPetitionManager implements WorldG
         ArrayList<String> regions = new ArrayList<>();
 
         try {
-            Class<?> bukkitAdapter = Class.forName("com.sk89q.worldedit.bukkit.BukkitAdapter");
-            Method adaptBukkitWorldToWorldGuards = bukkitAdapter.getDeclaredMethod("adapt", World.class);
-            Class<?> wgWorld = Class.forName("com.sk89q.worldedit.world.World");
+            Class<?> worldManagerClass = Class.forName("com.sk89q.worldguard.protection.managers.RegionManager");
+            Method getRegions = worldManagerClass.getDeclaredMethod("getRegions");
 
-            RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-            Method getContainerRegion = container.getClass().getDeclaredMethod("get", wgWorld);
             for (World world : Bukkit.getWorlds()) {
-                RegionManager worldManager = (RegionManager)getContainerRegion.invoke(container, wgWorld.cast(adaptBukkitWorldToWorldGuards.invoke(null, world)));
-                regions.addAll(worldManager.getRegions().keySet());
+                regions.addAll(
+                        ((Map<String, Object>) getRegions.invoke(worldManagerClass.cast(this.getWorldManager(world))))
+                                .keySet()
+                );
             }
         } catch (Exception ex) {
             throw new RuntimeException(ex);
@@ -81,18 +101,29 @@ public class WorldGuardManager extends ExtendedPetitionManager implements WorldG
         if (positionWorld == null) throw new IllegalArgumentException("The world specified doesn't exists.");
 
         try {
-            Class<?> bukkitAdapter = Class.forName("com.sk89q.worldedit.bukkit.BukkitAdapter");
-            Method adaptBukkitWorldToWorldGuards = bukkitAdapter.getDeclaredMethod("adapt", World.class);
-            Class<?> wgWorld = Class.forName("com.sk89q.worldedit.world.World");
             Class<?> vectorClass = Class.forName("com.sk89q.worldedit.math.BlockVector3");
             Method vectorBuilder = vectorClass.getDeclaredMethod("at", double.class, double.class, double.class);
+            Class<?> worldManagerClass = Class.forName("com.sk89q.worldguard.protection.managers.RegionManager");
+            Class<?> applicableRegionSetClass = Class.forName("com.sk89q.worldguard.protection.ApplicableRegionSet");
+            Method getRegions = worldManagerClass.getDeclaredMethod("getRegions");
+            final Class<?> protectedRegionClass = Class.forName("com.sk89q.worldguard.protection.regions.ProtectedRegion");
+            final Method getProtectedRegionId = protectedRegionClass.getDeclaredMethod("getId");
 
-            RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-            Method getContainerRegion = container.getClass().getDeclaredMethod("get", wgWorld);
-            RegionManager worldManager = (RegionManager)getContainerRegion.invoke(container, wgWorld.cast(adaptBukkitWorldToWorldGuards.invoke(null, positionWorld)));
-            Method getApplicableRegions = worldManager.getClass().getDeclaredMethod("getApplicableRegions", vectorClass);
+            Object worldManager = this.getWorldManager(positionWorld);
+            Method getApplicableRegions = worldManagerClass.getDeclaredMethod("getApplicableRegions", vectorClass);
             Object positionVector = vectorBuilder.invoke(null, position.getX(), position.getY(), position.getZ());
-            return ((ApplicableRegionSet)getApplicableRegions.invoke(worldManager, vectorClass.cast(positionVector))).getRegions().stream().map(r -> r.getId())
+            return ((Set<Object>)getRegions.invoke(
+                            applicableRegionSetClass.cast(
+                                    getApplicableRegions.invoke(worldManagerClass.cast(worldManager), vectorClass.cast(positionVector))
+                            )
+                )).stream()
+                    .map(r -> {
+                        try {
+                            return (int)getProtectedRegionId.invoke(protectedRegionClass.cast(r));
+                        } catch (Exception ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    })
                     .collect(Collectors.toList()).toArray(new String[0]);
         } catch (Exception ex) {
             throw new RuntimeException(ex);

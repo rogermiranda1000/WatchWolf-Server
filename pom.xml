@@ -44,15 +44,6 @@
             <artifactId>XSeries</artifactId>
             <version>LATEST</version>
         </dependency>
-
-        <!-- TODO remove (use reflection) -->
-        <dependency>
-            <groupId>com.sk89q</groupId>
-            <artifactId>worldguard</artifactId>
-            <version>7.0.8</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/worldguard-bukkit-7.0.8-dist.jar</systemPath>
-        </dependency>
     </dependencies>
 
     <build>
