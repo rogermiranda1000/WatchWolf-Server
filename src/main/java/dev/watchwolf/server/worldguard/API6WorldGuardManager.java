@@ -1,7 +1,5 @@
 package dev.watchwolf.server.worldguard;
 
-import com.sk89q.worldguard.bukkit.RegionContainer;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import dev.watchwolf.entities.Position;
 import dev.watchwolf.server.ExtendedPetitionManager;
 import dev.watchwolf.server.WorldGuardServerPetition;
