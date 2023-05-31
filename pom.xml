@@ -6,7 +6,7 @@
 
     <groupId>dev.watchwolf</groupId>
     <artifactId>watchwolf-server</artifactId>
-    <version>0.1.19</version>
+    <version>0.1.20</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -26,9 +26,9 @@
         <dependency>
             <groupId>dev.watchwolf</groupId>
             <artifactId>watchwolf-tester</artifactId>
-            <version>0.1.18</version>
+            <version>0.1.20</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/watchwolf-tester-0.1.18.jar</systemPath>
+            <systemPath>${basedir}/lib/watchwolf-tester-0.1.20.jar</systemPath>
         </dependency>
 
         <dependency>
@@ -43,6 +43,15 @@
             <groupId>com.github.cryptomorin</groupId>
             <artifactId>XSeries</artifactId>
             <version>LATEST</version>
+        </dependency>
+
+        <!-- TODO remove (use reflection) -->
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>worldguard</artifactId>
+            <version>7.0.8</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/worldguard-bukkit-7.0.8-dist.jar</systemPath>
         </dependency>
     </dependencies>
 

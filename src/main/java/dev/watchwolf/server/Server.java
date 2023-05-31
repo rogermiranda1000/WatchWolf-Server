@@ -7,6 +7,8 @@ import dev.watchwolf.entities.blocks.Block;
 import dev.watchwolf.entities.entities.Chicken;
 import dev.watchwolf.entities.entities.Entity;
 import dev.watchwolf.entities.items.Item;
+import dev.watchwolf.server.worldguard.UnimplementedWorldGuardManager;
+import dev.watchwolf.server.worldguard.WorldGuardManager;
 import dev.watchwolf.utils.SpigotToWatchWolfTranslator;
 import dev.watchwolf.utils.WatchWolfToSpigotTranslator;
 import org.apache.logging.log4j.LogManager;
@@ -16,6 +18,8 @@ import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -24,7 +28,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Server extends JavaPlugin implements ServerPetition, SequentialExecutor {
+public class Server extends JavaPlugin implements ServerPetition, WorldGuardServerPetition, SequentialExecutor {
     private ServerWhitelistResolver whitelistResolver;
 
     private ServerConnector connector;
@@ -32,6 +36,8 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
     private final Queue<SequentialExecutor.ThrowableRunnable> futureExecute = new LinkedList<>();
     private int futureExecuteTaskID;
     private CommandRunner commandRunner;
+
+    private WorldGuardServerPetition worldGuardManager;
 
     @Override
     public void onEnable() {
@@ -50,6 +56,12 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
         final String ip = config.getString("target-ip");
         final int port = config.getInt("use-port");
         final String []replyIP = config.getString("reply").split(":");
+
+        // extended petitions managers
+        PluginManager pm = this.getServer().getPluginManager();
+        Plugin worldguard = pm.getPlugin("WorldGuard");
+        if (worldguard != null) this.worldGuardManager = new WorldGuardManager(this, worldguard);
+        else this.worldGuardManager = new UnimplementedWorldGuardManager();
 
         // execute sequentially the orders one by one (and letting the server update)
         this.futureExecuteTaskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
@@ -70,7 +82,7 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
             try {
                 getLogger().info("Hosting on " + port + " (for " + ip + ")");
                 getLogger().info("Reply to " + replyIP[0] + ":" + replyIP[1]);
-                this.connector = new ServerConnector(ip, port, new Socket(replyIP[0], Integer.parseInt(replyIP[1])), config.getString("key"), this, this);
+                this.connector = new ServerConnector(ip, port, new Socket(replyIP[0], Integer.parseInt(replyIP[1])), config.getString("key"), this, this, this);
 
                 this.connector.onServerStart();
                 getLogger().info("Server started notified.");
@@ -270,4 +282,19 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
 
     @Override
     public void synchronize() throws IOException {}
+
+    @Override
+    public void createRegion(String s, Position firstPosition, Position secondPosition) throws IOException {
+        this.worldGuardManager.createRegion(s, firstPosition, secondPosition);
+    }
+
+    @Override
+    public String[] getRegions() throws IOException {
+        return this.worldGuardManager.getRegions();
+    }
+
+    @Override
+    public String[] getRegions(Position position) throws IOException {
+        return this.worldGuardManager.getRegions(position);
+    }
 }
