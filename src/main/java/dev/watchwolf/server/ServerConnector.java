@@ -5,6 +5,7 @@ import dev.watchwolf.entities.blocks.Block;
 import dev.watchwolf.entities.blocks.BlockReader;
 import dev.watchwolf.entities.entities.Entity;
 import dev.watchwolf.entities.entities.EntityType;
+import dev.watchwolf.entities.files.ConfigFile;
 import dev.watchwolf.entities.items.Item;
 
 import java.io.DataInputStream;
@@ -53,17 +54,11 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
      */
     private final ServerPetition serverPetition;
 
-    /**
-     * Implementations of the server petitions
-     */
-    private final WorldGuardServerPetition wgServerPetition;
-
-    public ServerConnector(String allowedIp, int port, Socket reply, String key, SequentialExecutor executor, ServerPetition serverPetition, WorldGuardServerPetition wgServerPetition) throws IOException {
+    public ServerConnector(String allowedIp, int port, Socket reply, String key, SequentialExecutor executor, ServerPetition serverPetition) throws IOException {
         this.allowedIp = allowedIp;
         this.serverSocket = new ServerSocket(port);
         this.executor = executor;
         this.serverPetition = serverPetition;
-        this.wgServerPetition = wgServerPetition;
 
         this.replySocket = reply;
         this.replyKey = key;
@@ -131,8 +126,12 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                 this.processDefaultGroup(dis, dos);
                 break;
 
+            case 2:
+                this.processEIGroup(dis, dos);
+                break;
+
             case 3:
-                this.processWorldGuard(dis, dos);
+                this.processWorldGuardGroup(dis, dos);
                 break;
 
             default:
@@ -375,7 +374,43 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
     }
 
 
-    private void processWorldGuard(DataInputStream dis, DataOutputStream dos) throws IOException, UnexpectedPacketException {
+    private void processEIGroup(DataInputStream dis, DataOutputStream dos) throws IOException, UnexpectedPacketException {
+        int operation = SocketHelper.readShort(dis);
+        switch (operation) {
+            case 0x0004:
+                this.executor.run(() -> this.serverPetition.startTimings());
+                break;
+
+            case 0x0005:
+                this.executor.run(() -> {
+                    // we can't run `stopTimings` in the same thread as the server
+                    new Thread(()-> {
+                        try {
+                            ConfigFile timingsReport = this.serverPetition.stopTimings();
+                            Message msg = new Message(dos);
+
+                            // stop timings response header
+                            msg.add((byte) 0b0010_1_001);
+                            msg.add((byte) 0b00000000);
+                            msg.add((short) 0x0005);
+
+                            msg.add(timingsReport);
+
+                            msg.send();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).start();
+                });
+                break;
+
+            default:
+                throw new UnexpectedPacketException("Operation " + (int) operation + " from group 2"); // unimplemented by this version, or error
+        }
+    }
+
+
+    private void processWorldGuardGroup(DataInputStream dis, DataOutputStream dos) throws IOException, UnexpectedPacketException {
         String name;
         Position pos1, pos2;
 
@@ -386,15 +421,15 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                 pos1 = (Position) SocketData.readSocketData(dis, Position.class);
                 pos2 = (Position) SocketData.readSocketData(dis, Position.class);
 
-                this.executor.run(() -> this.wgServerPetition.createRegion(name, pos1, pos2));
+                this.executor.run(() -> this.serverPetition.createRegion(name, pos1, pos2));
                 break;
 
             case 0x0002:
                 this.executor.run(() -> {
-                    String []regions = this.wgServerPetition.getRegions();
+                    String []regions = this.serverPetition.getRegions();
                     Message msg = new Message(dos);
 
-                    // get entity response header
+                    // get region response header
                     msg.add((byte) 0b0011_1_001);
                     msg.add((byte) 0b00000000);
                     msg.add((short) 0x0002);
@@ -411,10 +446,10 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                 pos1 = (Position) SocketData.readSocketData(dis, Position.class);
 
                 this.executor.run(() -> {
-                    String []regions = this.wgServerPetition.getRegions(pos1);
+                    String []regions = this.serverPetition.getRegions(pos1);
                     Message msg = new Message(dos);
 
-                    // get entity response header
+                    // get region at block response header
                     msg.add((byte) 0b0011_1_001);
                     msg.add((byte) 0b00000000);
                     msg.add((short) 0x0003);

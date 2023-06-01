@@ -6,6 +6,7 @@ import dev.watchwolf.entities.Position;
 import dev.watchwolf.entities.blocks.Block;
 import dev.watchwolf.entities.entities.Chicken;
 import dev.watchwolf.entities.entities.Entity;
+import dev.watchwolf.entities.files.ConfigFile;
 import dev.watchwolf.entities.items.Item;
 import dev.watchwolf.server.worldguard.UnimplementedWorldGuardManager;
 import dev.watchwolf.server.worldguard.WorldGuardManagerFactory;
@@ -28,7 +29,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Server extends JavaPlugin implements ServerPetition, WorldGuardServerPetition, SequentialExecutor {
+public class Server extends JavaPlugin implements ServerPetition, SequentialExecutor {
     private ServerWhitelistResolver whitelistResolver;
 
     private ServerConnector connector;
@@ -38,6 +39,8 @@ public class Server extends JavaPlugin implements ServerPetition, WorldGuardServ
     private CommandRunner commandRunner;
 
     private WorldGuardServerPetition worldGuardManager;
+
+    private EnhancedInformationServerPetition enhancedInformationProvider;
 
     @Override
     public void onEnable() {
@@ -63,6 +66,8 @@ public class Server extends JavaPlugin implements ServerPetition, WorldGuardServ
         if (worldguard != null) this.worldGuardManager = WorldGuardManagerFactory.build(this, worldguard);
         else this.worldGuardManager = new UnimplementedWorldGuardManager();
 
+        this.enhancedInformationProvider = new EnhancedInformationProvider(this, this);
+
         // execute sequentially the orders one by one (and letting the server update)
         this.futureExecuteTaskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
             synchronized (this.futureExecute) {
@@ -82,7 +87,7 @@ public class Server extends JavaPlugin implements ServerPetition, WorldGuardServ
             try {
                 getLogger().info("Hosting on " + port + " (for " + ip + ")");
                 getLogger().info("Reply to " + replyIP[0] + ":" + replyIP[1]);
-                this.connector = new ServerConnector(ip, port, new Socket(replyIP[0], Integer.parseInt(replyIP[1])), config.getString("key"), this, this, this);
+                this.connector = new ServerConnector(ip, port, new Socket(replyIP[0], Integer.parseInt(replyIP[1])), config.getString("key"), this, this);
 
                 this.connector.onServerStart();
                 getLogger().info("Server started notified.");
@@ -301,5 +306,17 @@ public class Server extends JavaPlugin implements ServerPetition, WorldGuardServ
         String[] r = this.worldGuardManager.getRegions(position);
         getLogger().info("WorldGuard list at pos=" + position.toString() + " request, got " + Arrays.asList(r).toString());
         return r;
+    }
+
+    @Override
+    public void startTimings() throws IOException {
+        getLogger().info("Start timings request");
+        this.enhancedInformationProvider.startTimings();
+    }
+
+    @Override
+    public ConfigFile stopTimings() throws IOException {
+        getLogger().info("Stop timings request");
+        return this.enhancedInformationProvider.stopTimings();
     }
 }

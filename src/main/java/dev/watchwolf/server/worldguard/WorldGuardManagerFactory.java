@@ -1,15 +1,15 @@
 package dev.watchwolf.server.worldguard;
 
+import dev.watchwolf.server.Server;
 import dev.watchwolf.server.WorldGuardServerPetition;
 import dev.watchwolf.utils.Version;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class WorldGuardManagerFactory {
-    public static WorldGuardServerPetition build(JavaPlugin watchwolf, Plugin plugin) {
+    public static WorldGuardServerPetition build(Server watchwolf, Plugin plugin) {
         Pattern versionPattern = Pattern.compile("^(v?[\\d\\.]+)");
         String wgVersion = plugin.getDescription().getVersion();
         Matcher m = versionPattern.matcher(wgVersion);

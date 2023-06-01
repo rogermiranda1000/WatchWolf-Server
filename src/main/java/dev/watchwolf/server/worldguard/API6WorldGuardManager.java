@@ -2,6 +2,7 @@ package dev.watchwolf.server.worldguard;
 
 import dev.watchwolf.entities.Position;
 import dev.watchwolf.server.ExtendedPetitionManager;
+import dev.watchwolf.server.Server;
 import dev.watchwolf.server.WorldGuardServerPetition;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -18,7 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class API6WorldGuardManager extends ExtendedPetitionManager implements WorldGuardServerPetition {
-    public API6WorldGuardManager(JavaPlugin watchwolf, Plugin plugin) {
+    public API6WorldGuardManager(Server watchwolf, Plugin plugin) {
         super(watchwolf, plugin);
     }
 
