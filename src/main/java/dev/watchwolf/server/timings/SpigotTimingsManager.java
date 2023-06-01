@@ -42,7 +42,17 @@ public class SpigotTimingsManager extends ExtendedPetitionManager implements Tim
 
                 this.getWatchWolf().runCommand("timings off");
             } catch (IOException ignore) {}
+
+            synchronized (result) {
+                result.notify();
+            }
         });
+
+        synchronized (result) {
+            try {
+                result.wait();
+            } catch (InterruptedException ignore) { }
+        }
         if (result.get() == null) throw new IllegalArgumentException("The return of the timings doesn't contain an Spigot URL (got '" + result + "' instead)");
         return result.get();
     }
