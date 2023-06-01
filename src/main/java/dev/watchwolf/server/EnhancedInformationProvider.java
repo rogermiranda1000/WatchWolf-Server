@@ -33,6 +33,7 @@ public class EnhancedInformationProvider extends ExtendedPetitionManager impleme
                 timingsPath = this.timingsOperator.stopTimings();
                 timeoutRaised = false;
             } catch (TimeoutException ignore) {
+                this.getWatchWolf().getLogger().info("Tried to get timings report, but it was too soon. Trying again later...");
                 timeoutRaised = true;
                 try { Thread.sleep(30_000); } catch (InterruptedException ignored) {}
             }

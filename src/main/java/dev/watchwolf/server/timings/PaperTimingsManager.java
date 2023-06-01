@@ -47,7 +47,7 @@ public class PaperTimingsManager extends ExtendedPetitionManager implements Timi
                     this.foundUrl = null; // timeout
                     this.callbackResolved.notifyAll();
                 }
-                else if (m.matches()) {
+                else if (m.find()) {
                     this.foundUrl = m.group();
                     this.callbackResolved.notifyAll();
                 }
