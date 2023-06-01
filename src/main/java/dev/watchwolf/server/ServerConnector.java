@@ -383,19 +383,25 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
 
             case 0x0005:
                 this.executor.run(() -> {
-                    ConfigFile timingsReport = this.serverPetition.stopTimings();
-                    Message msg = new Message(dos);
+                    // we can't run `stopTimings` in the same thread as the server
+                    new Thread(()-> {
+                        try {
+                            ConfigFile timingsReport = this.serverPetition.stopTimings();
+                            Message msg = new Message(dos);
 
-                    // stop timings response header
-                    msg.add((byte) 0b0010_1_001);
-                    msg.add((byte) 0b00000000);
-                    msg.add((short) 0x0005);
+                            // stop timings response header
+                            msg.add((byte) 0b0010_1_001);
+                            msg.add((byte) 0b00000000);
+                            msg.add((short) 0x0005);
 
-                    msg.add(timingsReport);
+                            msg.add(timingsReport);
 
-                    msg.send();
+                            msg.send();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).start();
                 });
-                break;
 
             default:
                 throw new UnexpectedPacketException("Operation " + (int) operation + " from group 2"); // unimplemented by this version, or error
