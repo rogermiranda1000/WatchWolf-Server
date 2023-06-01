@@ -28,6 +28,7 @@ public class PaperTimingsManager  extends ExtendedPetitionManager implements Tim
         String result = null;
         try {
             result = this.getWatchWolf().runCommand("timings report"); // TODO check if error
+            // TODO it doesn't return the url immediately
             this.getWatchWolf().runCommand("timings off");
         } catch (IOException ignore) {}
         return result;

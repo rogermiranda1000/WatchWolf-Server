@@ -6,6 +6,8 @@ import org.bukkit.plugin.Plugin;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SpigotTimingsManager extends ExtendedPetitionManager implements TimingsOperator {
     public SpigotTimingsManager(Server watchwolf, Plugin _watchwolf) {
@@ -24,10 +26,16 @@ public class SpigotTimingsManager extends ExtendedPetitionManager implements Tim
     }
 
     @Override
-    public String stopTimings() throws TimeoutException {
+    public String stopTimings() throws TimeoutException, IllegalArgumentException {
         String result = null;
         try {
-            result = this.getWatchWolf().runCommand("timings paste"); // TODO get only the URL
+            result = this.getWatchWolf().runCommand("timings paste");
+
+            Pattern p = Pattern.compile("https:\\/\\/www\\.spigotmc\\.org\\/go\\/timings\\?url=\\S+");
+            Matcher m = p.matcher(result);
+            if (!m.matches()) throw new IllegalArgumentException("The return of the timings doesn't contain an Spigot URL (got '" + result + "' instead)");
+            result = m.group(); // get only the url; discard the rest
+
             this.getWatchWolf().runCommand("timings off");
         } catch (IOException ignore) {}
         return result;

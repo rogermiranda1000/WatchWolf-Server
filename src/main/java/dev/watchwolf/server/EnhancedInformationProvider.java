@@ -7,6 +7,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
 public class EnhancedInformationProvider extends ExtendedPetitionManager implements EnhancedInformationServerPetition {
@@ -38,6 +39,6 @@ public class EnhancedInformationProvider extends ExtendedPetitionManager impleme
         } while (timeoutRaised);
 
         // TODO generate a redirect file to timingsPath's url
-        return new ConfigFile(timingsPath, new byte[]{}, "");
+        return new ConfigFile("index.html", timingsPath.getBytes(StandardCharsets.UTF_8), "");
     }
 }
