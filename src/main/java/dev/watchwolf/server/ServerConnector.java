@@ -402,6 +402,7 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                         }
                     }).start();
                 });
+                break;
 
             default:
                 throw new UnexpectedPacketException("Operation " + (int) operation + " from group 2"); // unimplemented by this version, or error
