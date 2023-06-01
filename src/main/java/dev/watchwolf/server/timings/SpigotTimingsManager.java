@@ -27,7 +27,7 @@ public class SpigotTimingsManager extends ExtendedPetitionManager implements Tim
     public String stopTimings() throws TimeoutException {
         String result = null;
         try {
-            result = this.getWatchWolf().runCommand("timings paste");
+            result = this.getWatchWolf().runCommand("timings paste"); // TODO get only the URL
             this.getWatchWolf().runCommand("timings off");
         } catch (IOException ignore) {}
         return result;
