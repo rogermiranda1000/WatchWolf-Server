@@ -1,18 +1,17 @@
 package dev.watchwolf.server;
 
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class ExtendedPetitionManager {
-    private JavaPlugin watchwolf;
+    private Server watchwolf;
     private Plugin plugin;
 
-    public ExtendedPetitionManager(JavaPlugin watchwolf, Plugin plugin) {
+    public ExtendedPetitionManager(Server watchwolf, Plugin plugin) {
         this.watchwolf = watchwolf;
         this.plugin = plugin;
     }
 
-    public JavaPlugin getWatchWolf() {
+    public Server getWatchWolf() {
         return watchwolf;
     }
 
