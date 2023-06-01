@@ -126,6 +126,10 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                 this.processDefaultGroup(dis, dos);
                 break;
 
+            case 2:
+                this.processEIGroup(dis, dos);
+                break;
+
             case 3:
                 this.processWorldGuardGroup(dis, dos);
                 break;
