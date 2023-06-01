@@ -39,7 +39,18 @@ public class EnhancedInformationProvider extends ExtendedPetitionManager impleme
             }
         } while (timeoutRaised);
 
-        // TODO generate a redirect file to timingsPath's url
-        return new ConfigFile("index.html", timingsPath.getBytes(StandardCharsets.UTF_8), "");
+        return new ConfigFile("index.html", urlToHtml(timingsPath).getBytes(StandardCharsets.UTF_8), "");
+    }
+
+    private static String urlToHtml(String url) {
+        return "<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "  <head>\n" +
+                "    <meta http-equiv=\"refresh\" content=\"0; url='" + url + "'\" />\n" +
+                "  </head>\n" +
+                "  <body>\n" +
+                "    <p>You will be redirected to " + url + " soon.</p>\n" +
+                "  </body>\n" +
+                "</html>";
     }
 }
