@@ -44,6 +44,7 @@ public class PaperTimingsManager extends ExtendedPetitionManager implements Timi
                 Matcher m = p.matcher(msg);
 
                 if (msg.contains("Please wait at least 3 minutes before generating a Timings report.")) {
+                    // Paper's timings v2 (>1.9)
                     this.foundUrl = null; // timeout
                     this.callbackResolved.notifyAll();
                 }
