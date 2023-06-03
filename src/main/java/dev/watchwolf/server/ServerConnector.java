@@ -141,12 +141,12 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
     }
 
     private void processDefaultGroup(DataInputStream dis, DataOutputStream dos) throws IOException, UnexpectedPacketException {
-        // TODO implement all
         String nick, cmd, uuid;
         Position position;
         Block block;
         Item item;
         Entity entity;
+        Difficulty difficulty;
         int operation = SocketHelper.readShort(dis);
         double radius;
         switch (operation) {
@@ -363,6 +363,27 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
                     msg.add((short) 0x0012);
 
                     msg.add(e);
+
+                    msg.send();
+                });
+                break;
+
+            case 0x0013:
+                difficulty = Difficulty.fromSocketData(dis);
+                this.executor.run(() -> this.serverPetition.setDifficulty(difficulty));
+                break;
+
+            case 0xFFFF:
+                this.executor.run(() -> {
+                    String version = this.serverPetition.getVersion();
+                    Message msg = new Message(dos);
+
+                    // get entity response header
+                    msg.add((byte) 0b0001_1_001);
+                    msg.add((byte) 0b00000000);
+                    msg.add((short) 0xFFFF);
+
+                    msg.add(version);
 
                     msg.send();
                 });

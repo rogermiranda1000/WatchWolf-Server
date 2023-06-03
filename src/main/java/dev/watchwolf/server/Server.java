@@ -2,6 +2,7 @@ package dev.watchwolf.server;
 
 import com.cryptomorin.xseries.XMaterial;
 import dev.watchwolf.entities.Container;
+import dev.watchwolf.entities.Difficulty;
 import dev.watchwolf.entities.Position;
 import dev.watchwolf.entities.blocks.Block;
 import dev.watchwolf.entities.entities.Chicken;
@@ -271,6 +272,11 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
         return SpigotToWatchWolfTranslator.getEntity(e);
     }
 
+    @Override
+    public void setDifficulty(Difficulty difficulty) throws IOException {
+        for (World w : this.getServer().getWorlds()) w.setDifficulty(org.bukkit.Difficulty.valueOf(difficulty.name()));
+    }
+
     public List<org.bukkit.entity.Entity> getEntitiesByRadius(Position position, double radius) {
         ArrayList<org.bukkit.entity.Entity> r = new ArrayList<>();
 
@@ -283,6 +289,11 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
         }
 
         return r;
+    }
+
+    @Override
+    public String getVersion() throws IOException {
+        return getClass().getPackage().getImplementationVersion(); // Maven version
     }
 
     @Override
