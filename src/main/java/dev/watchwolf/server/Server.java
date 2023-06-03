@@ -274,6 +274,7 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
 
     @Override
     public void setDifficulty(Difficulty difficulty) throws IOException {
+        getLogger().info("Changing difficulty to " + difficulty.name() + "...");
         for (World w : this.getServer().getWorlds()) w.setDifficulty(org.bukkit.Difficulty.valueOf(difficulty.name()));
     }
 
