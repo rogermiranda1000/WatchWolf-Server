@@ -1,4 +1,4 @@
-package dev.watchwolf.server;
+package dev.watchwolf.server.events.whitelist;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

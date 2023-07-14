@@ -9,6 +9,9 @@ import dev.watchwolf.entities.entities.Chicken;
 import dev.watchwolf.entities.entities.Entity;
 import dev.watchwolf.entities.files.ConfigFile;
 import dev.watchwolf.entities.items.Item;
+import dev.watchwolf.server.events.invincibility.OnPlayerDamage;
+import dev.watchwolf.server.events.whitelist.OfflineSpigotWhitelistResolver;
+import dev.watchwolf.server.events.whitelist.ServerWhitelistResolver;
 import dev.watchwolf.server.worldguard.UnimplementedWorldGuardManager;
 import dev.watchwolf.server.worldguard.WorldGuardManagerFactory;
 import dev.watchwolf.utils.SpigotToWatchWolfTranslator;
@@ -32,6 +35,7 @@ import java.util.regex.Pattern;
 
 public class Server extends JavaPlugin implements ServerPetition, SequentialExecutor {
     private ServerWhitelistResolver whitelistResolver;
+    private OnPlayerDamage playerDamageResolver;
 
     private ServerConnector connector;
 
@@ -46,6 +50,7 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
     @Override
     public void onEnable() {
         this.whitelistResolver = new OfflineSpigotWhitelistResolver(this);
+        this.playerDamageResolver = new OnPlayerDamage(this);
 
         // get the logger
         final org.apache.logging.log4j.core.Logger logger = (org.apache.logging.log4j.core.Logger) LogManager.getRootLogger();
@@ -276,6 +281,12 @@ public class Server extends JavaPlugin implements ServerPetition, SequentialExec
     public void setDifficulty(Difficulty difficulty) throws IOException {
         getLogger().info("Changing difficulty to " + difficulty.name() + "...");
         for (World w : this.getServer().getWorlds()) w.setDifficulty(org.bukkit.Difficulty.valueOf(difficulty.name()));
+    }
+
+    @Override
+    public void setInvincibleMode(boolean b) throws IOException {
+        getLogger().info("Invincibility mode set to " + (b ? "true" : "false"));
+        this.playerDamageResolver.setInvincible(b);
     }
 
     public List<org.bukkit.entity.Entity> getEntitiesByRadius(Position position, double radius) {

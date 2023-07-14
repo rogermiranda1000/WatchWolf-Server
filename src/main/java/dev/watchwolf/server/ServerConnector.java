@@ -149,6 +149,7 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
         Difficulty difficulty;
         int operation = SocketHelper.readShort(dis);
         double radius;
+        boolean state;
         switch (operation) {
             case 0x0001:
                 this.executor.run(() -> this.serverPetition.stopServer(null));
@@ -371,6 +372,11 @@ public class ServerConnector implements Runnable, ServerStartNotifier {
             case 0x0013:
                 difficulty = Difficulty.fromSocketData(dis);
                 this.executor.run(() -> this.serverPetition.setDifficulty(difficulty));
+                break;
+
+            case 0x0014:
+                state = SocketHelper.readBool(dis);
+                this.executor.run(() -> this.serverPetition.setInvincibleMode(state));
                 break;
 
             case 0xFFFF:
