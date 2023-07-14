@@ -11,6 +11,8 @@ public class OnPlayerDamage implements Listener {
     private PlayerDamageManager damageManager;
 
     public OnPlayerDamage(JavaPlugin plugin) {
+        this.setInvincible(false); // by default, disabled
+
         Server server = plugin.getServer();
         server.getPluginManager().registerEvents(this, plugin); // call onDamage event
     }
