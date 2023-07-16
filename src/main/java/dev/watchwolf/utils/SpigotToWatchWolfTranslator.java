@@ -102,7 +102,8 @@ public class SpigotToWatchWolfTranslator {
 
     public static Item getItem(ItemStack item) throws IllegalArgumentException {
         if (item == null) return null;
-        return new Item(ItemType.valueOf(item.getType().name()), (byte)item.getAmount());
+        XMaterial material = XMaterial.matchXMaterial(item.getType());
+        return new Item(ItemType.valueOf(material.name()), (byte)item.getAmount());
     }
 
     public static Position getPosition(Location loc) {

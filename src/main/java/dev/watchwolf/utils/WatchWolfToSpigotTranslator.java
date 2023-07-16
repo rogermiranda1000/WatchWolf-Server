@@ -43,8 +43,10 @@ public class WatchWolfToSpigotTranslator {
         return new Location(Bukkit.getWorld(pos.getWorld()), pos.getX(), pos.getY(), pos.getZ());
     }
 
-    public static ItemStack getItem(Item item) {
-        return new ItemStack(Material.valueOf(item.getType().name()), item.getAmount());
+    public static ItemStack getItem(final Item item) throws IllegalArgumentException {
+        XMaterial spigotMaterial = XMaterial.matchXMaterial(item.getType().name())
+                .orElseThrow(() -> new IllegalArgumentException("Material '" + item.getType().name() + "' not found"));
+        return new ItemStack(spigotMaterial.parseMaterial(), item.getAmount());
     }
 
     public static EntityType getType(dev.watchwolf.entities.entities.EntityType type) {
